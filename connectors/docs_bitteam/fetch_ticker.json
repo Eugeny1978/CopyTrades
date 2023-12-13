@@ -1,0 +1,649 @@
+{
+  "ok": true,
+  "result": {
+    "pair": {
+      "id": 24,
+      "name": "del_usdt",
+      "baseAssetId": 9,
+      "quoteAssetId": 3,
+      "fullName": "DEL USDT",
+      "description": "DEL USDT pair",
+      "lastBuy": "0.017967",
+      "lastSell": "0.017969",
+      "lastPrice": "0.017967",
+      "change24": "-0.03",
+      "volume24": 8699529.18505787,
+      "volume24USD": 155112.6053695818,
+      "active": true,
+      "baseStep": 8,
+      "quoteStep": 6,
+      "status": 1,
+      "settings": {
+        "limit_usd": "0.1",
+        "price_max": "10000000000000",
+        "price_min": "1",
+        "price_tick": "1",
+        "pricescale": 10000,
+        "lot_size_max": "1000000000000000",
+        "lot_size_min": "1",
+        "lot_size_tick": "1",
+        "price_view_min": 6,
+        "default_slippage": 10,
+        "lot_size_view_min": 6
+      },
+      "asks": [
+        {
+          "price": "0.017992",
+          "quantity": "558.03571429",
+          "amount": "10.04017857150568"
+        },
+        {
+          "price": "0.018",
+          "quantity": "2666.77738212",
+          "amount": "48.00199287816"
+        },
+        {
+          "price": "0.018036",
+          "quantity": "554.32372506",
+          "amount": "9.99778270518216"
+        },
+        {
+          "price": "0.018154",
+          "quantity": "952.23464553",
+          "amount": "17.28686775495162"
+        },
+        {
+          "price": "0.018155",
+          "quantity": "5000",
+          "amount": "90.775"
+        },
+        {
+          "price": "0.01816",
+          "quantity": "550.66079295",
+          "amount": "9.999999999972"
+        },
+        {
+          "price": "0.018237",
+          "quantity": "681.45276882",
+          "amount": "12.42765414497034"
+        },
+        {
+          "price": "0.018238",
+          "quantity": "1176.84171146",
+          "amount": "21.46323913360748"
+        },
+        {
+          "price": "0.018239",
+          "quantity": "9137.33665012",
+          "amount": "166.65588316153868"
+        },
+        {
+          "price": "0.01824",
+          "quantity": "261.08667055",
+          "amount": "4.762220870832"
+        },
+        {
+          "price": "0.018255",
+          "quantity": "5000",
+          "amount": "91.275"
+        },
+        {
+          "price": "0.018265",
+          "quantity": "54.80427046",
+          "amount": "1.0009999999519"
+        },
+        {
+          "price": "0.01828",
+          "quantity": "547.04595186",
+          "amount": "10.0000000000008"
+        },
+        {
+          "price": "0.018288",
+          "quantity": "3426.5012438",
+          "amount": "62.6638547466144"
+        },
+        {
+          "price": "0.018355",
+          "quantity": "5000",
+          "amount": "91.775"
+        },
+        {
+          "price": "0.0184",
+          "quantity": "543.47826087",
+          "amount": "10.000000000008"
+        },
+        {
+          "price": "0.01841",
+          "quantity": "9149.60389819",
+          "amount": "168.4442077656779"
+        },
+        {
+          "price": "0.01845",
+          "quantity": "317.16040822",
+          "amount": "5.851609531659"
+        },
+        {
+          "price": "0.0185",
+          "quantity": "4169.41865106",
+          "amount": "77.13424504461"
+        },
+        {
+          "price": "0.01852",
+          "quantity": "539.95680346",
+          "amount": "10.0000000000792"
+        },
+        {
+          "price": "0.018549",
+          "quantity": "898.632",
+          "amount": "16.668724968"
+        },
+        {
+          "price": "0.01855",
+          "quantity": "9160.74564615",
+          "amount": "169.9318317360825"
+        },
+        {
+          "price": "0.018555",
+          "quantity": "5000",
+          "amount": "92.775"
+        },
+        {
+          "price": "0.01856",
+          "quantity": "5579.31632994",
+          "amount": "103.5521110836864"
+        },
+        {
+          "price": "0.018599",
+          "quantity": "122310.4192631",
+          "amount": "2274.8514878743969"
+        },
+        {
+          "price": "0.0186",
+          "quantity": "11629.65411128",
+          "amount": "216.311566469808"
+        },
+        {
+          "price": "0.01863",
+          "quantity": "9160.74564616",
+          "amount": "170.6646913879608"
+        },
+        {
+          "price": "0.01864",
+          "quantity": "536.4806867",
+          "amount": "10.000000000088"
+        },
+        {
+          "price": "0.0187",
+          "quantity": "11116.60068737",
+          "amount": "207.880432853819"
+        },
+        {
+          "price": "0.01875",
+          "quantity": "496.69441798",
+          "amount": "9.313020337125"
+        },
+        {
+          "price": "0.01876",
+          "quantity": "533.04904051",
+          "amount": "9.9999999999676"
+        },
+        {
+          "price": "0.018798",
+          "quantity": "985.752",
+          "amount": "18.530166096"
+        },
+        {
+          "price": "0.0188",
+          "quantity": "22233.20137474",
+          "amount": "417.984185845112"
+        },
+        {
+          "price": "0.01888",
+          "quantity": "529.66101695",
+          "amount": "10.000000000016"
+        },
+        {
+          "price": "0.018969",
+          "quantity": "2337.92763379",
+          "amount": "44.34814928536251"
+        },
+        {
+          "price": "0.018998",
+          "quantity": "1330.97738914",
+          "amount": "25.28590843888172"
+        },
+        {
+          "price": "0.019",
+          "quantity": "7296.2959596",
+          "amount": "138.6296232324"
+        },
+        {
+          "price": "0.019016",
+          "quantity": "8459.2740446",
+          "amount": "160.8615552321136"
+        },
+        {
+          "price": "0.019055",
+          "quantity": "2819.75801487",
+          "amount": "53.73048897334785"
+        },
+        {
+          "price": "0.01909",
+          "quantity": "2337.92763379",
+          "amount": "44.6310385290511"
+        },
+        {
+          "price": "0.019094",
+          "quantity": "118.27440683",
+          "amount": "2.25833152401202"
+        },
+        {
+          "price": "0.0191",
+          "quantity": "6701.59108075",
+          "amount": "128.000389642325"
+        },
+        {
+          "price": "0.019101",
+          "quantity": "5654.46747438",
+          "amount": "108.00598322813238"
+        },
+        {
+          "price": "0.019104",
+          "quantity": "7539.28996584",
+          "amount": "144.03059550740736"
+        },
+        {
+          "price": "0.01912",
+          "quantity": "523.0125523",
+          "amount": "9.999999999976"
+        },
+        {
+          "price": "0.019162",
+          "quantity": "510.13566128",
+          "amount": "9.77521954144736"
+        },
+        {
+          "price": "0.019167",
+          "quantity": "1387.79858757",
+          "amount": "26.59993552795419"
+        },
+        {
+          "price": "0.019239",
+          "quantity": "427.6295",
+          "amount": "8.2271639505"
+        },
+        {
+          "price": "0.01924",
+          "quantity": "519.75051975",
+          "amount": "9.99999999999"
+        },
+        {
+          "price": "0.019299",
+          "quantity": "500",
+          "amount": "9.6495"
+        }
+      ],
+      "bids": [
+        {
+          "price": "0.017902",
+          "quantity": "1436.21826298",
+          "amount": "25.71117934386796"
+        },
+        {
+          "price": "0.0178",
+          "quantity": "2398.89991675",
+          "amount": "42.70041851815"
+        },
+        {
+          "price": "0.01768",
+          "quantity": "565.61085973",
+          "amount": "10.0000000000264"
+        },
+        {
+          "price": "0.017609",
+          "quantity": "8627.83445965",
+          "amount": "151.92753699997685"
+        },
+        {
+          "price": "0.017608",
+          "quantity": "6133.43667651",
+          "amount": "107.99755299998808"
+        },
+        {
+          "price": "0.017607",
+          "quantity": "28397.796331",
+          "amount": "499.999999999917"
+        },
+        {
+          "price": "0.01758",
+          "quantity": "823.07076704",
+          "amount": "14.4695840845632"
+        },
+        {
+          "price": "0.01756",
+          "quantity": "569.476082",
+          "amount": "9.99999999992"
+        },
+        {
+          "price": "0.017534",
+          "quantity": "137.74050416",
+          "amount": "2.41514199994144"
+        },
+        {
+          "price": "0.017506",
+          "quantity": "4036.90169084",
+          "amount": "70.67000099984504"
+        },
+        {
+          "price": "0.017505",
+          "quantity": "9568.85004284",
+          "amount": "167.5027199999142"
+        },
+        {
+          "price": "0.017501",
+          "quantity": "66503.09833723",
+          "amount": "1163.87072399986223"
+        },
+        {
+          "price": "0.0175",
+          "quantity": "35872.92876613",
+          "amount": "627.776253407275"
+        },
+        {
+          "price": "0.01744",
+          "quantity": "573.39449541",
+          "amount": "9.9999999999504"
+        },
+        {
+          "price": "0.0174",
+          "quantity": "152.87770114",
+          "amount": "2.660071999836"
+        },
+        {
+          "price": "0.017391",
+          "quantity": "2012.53527686",
+          "amount": "35.00000099987226"
+        },
+        {
+          "price": "0.01732",
+          "quantity": "577.36720554",
+          "amount": "9.9999999999528"
+        },
+        {
+          "price": "0.01731",
+          "quantity": "760.01519352",
+          "amount": "13.1558629998312"
+        },
+        {
+          "price": "0.0173",
+          "quantity": "341.93774566",
+          "amount": "5.915522999918"
+        },
+        {
+          "price": "0.01725",
+          "quantity": "5756.96836231",
+          "amount": "99.3077042498475"
+        },
+        {
+          "price": "0.01724",
+          "quantity": "5075.66705336",
+          "amount": "87.5044999999264"
+        },
+        {
+          "price": "0.0172",
+          "quantity": "2958.21687356",
+          "amount": "50.881330225232"
+        },
+        {
+          "price": "0.017104",
+          "quantity": "1530.7950187",
+          "amount": "26.1827179998448"
+        },
+        {
+          "price": "0.0171",
+          "quantity": "8730.85999999",
+          "amount": "149.297705999829"
+        },
+        {
+          "price": "0.01708",
+          "quantity": "585.48009368",
+          "amount": "10.0000000000544"
+        },
+        {
+          "price": "0.01705",
+          "quantity": "1275.88692082",
+          "amount": "21.753871999981"
+        },
+        {
+          "price": "0.017025",
+          "quantity": "423348.20093979",
+          "amount": "7207.50312099992475"
+        },
+        {
+          "price": "0.017024",
+          "quantity": "1476.97403665",
+          "amount": "25.1440059999296"
+        },
+        {
+          "price": "0.017021",
+          "quantity": "1370.45296986",
+          "amount": "23.32647999998706"
+        },
+        {
+          "price": "0.01702",
+          "quantity": "1371.91527614",
+          "amount": "23.3499979999028"
+        },
+        {
+          "price": "0.017016",
+          "quantity": "1372.23774682",
+          "amount": "23.34999749988912"
+        },
+        {
+          "price": "0.017015",
+          "quantity": "755.60728768",
+          "amount": "12.8566579998752"
+        },
+        {
+          "price": "0.017012",
+          "quantity": "1343.5222196",
+          "amount": "22.8559999998352"
+        },
+        {
+          "price": "0.01701",
+          "quantity": "1622.87402998",
+          "amount": "27.6050872499598"
+        },
+        {
+          "price": "0.017006",
+          "quantity": "1641.42243913",
+          "amount": "27.91402999984478"
+        },
+        {
+          "price": "0.017001",
+          "quantity": "12198.66949002",
+          "amount": "207.38957999983002"
+        },
+        {
+          "price": "0.017",
+          "quantity": "65141.59489705",
+          "amount": "1107.40711324985"
+        },
+        {
+          "price": "0.01696",
+          "quantity": "589.62264151",
+          "amount": "10.0000000000096"
+        },
+        {
+          "price": "0.0169",
+          "quantity": "2093.49118343",
+          "amount": "35.380000999967"
+        },
+        {
+          "price": "0.01684",
+          "quantity": "593.82422803",
+          "amount": "10.0000000000252"
+        },
+        {
+          "price": "0.0168",
+          "quantity": "36411.97425594",
+          "amount": "611.721167499792"
+        },
+        {
+          "price": "0.01672",
+          "quantity": "598.0861244",
+          "amount": "9.999999999968"
+        },
+        {
+          "price": "0.0167",
+          "quantity": "3344.94520958",
+          "amount": "55.860584999986"
+        },
+        {
+          "price": "0.0166",
+          "quantity": "3102.40963855",
+          "amount": "51.49999999993"
+        },
+        {
+          "price": "0.016501",
+          "quantity": "3218.58681292",
+          "amount": "53.10990099999292"
+        },
+        {
+          "price": "0.0165",
+          "quantity": "2068.05442424",
+          "amount": "34.12289799996"
+        },
+        {
+          "price": "0.01648",
+          "quantity": "606.7961165",
+          "amount": "9.99999999992"
+        },
+        {
+          "price": "0.01636",
+          "quantity": "611.24694377",
+          "amount": "10.0000000000772"
+        },
+        {
+          "price": "0.0163",
+          "quantity": "2170.55226993",
+          "amount": "35.380001999859"
+        },
+        {
+          "price": "0.01624",
+          "quantity": "615.7635468",
+          "amount": "10.000000000032"
+        }
+      ],
+      "updateId": "311",
+      "timeStart": "2021-03-17T11:59:20.091Z",
+      "makerFee": 200,
+      "takerFee": 200,
+      "quoteVolume24": 156967.31808484276,
+      "lowPrice24": 0.01756,
+      "highPrice24": 0.018207,
+      "baseCurrency": {
+        "id": 9,
+        "status": 1,
+        "symbol": "del",
+        "title": "Decimal",
+        "logoURL": "https://img2.freepng.ru/20180406/dyq/kisspng-money-bag-currency-symbol-finance-money-bag-5ac729818c4364.6633897015230017295745.jpg",
+        "isDiscount": false,
+        "address": "https://explorer.decimalchain.com",
+        "description": "DecimalChain",
+        "decimals": 18,
+        "blockChain": "Decimal",
+        "precision": 8,
+        "currentRate": null,
+        "active": true,
+        "timeStart": "2021-01-29T04:47:24.183Z",
+        "txLimits": {
+          "minDeposit": "1000000000000000000",
+          "maxWithdraw": "1000000000000000000000000",
+          "minWithdraw": "100000000000000000",
+          "withdrawCommissionFixed": "2000000000000000000"
+        },
+        "type": "crypto",
+        "typeNetwork": "internalGW",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNSAzMEMyMy4yODQzIDMwIDMwIDIzLjI4NDMgMzAgMTVDMzAgNi43MTU3MyAyMy4yODQzIDAgMTUgMEM2LjcxNTczIDAgMCA2LjcxNTczIDAgMTVDMCAyMy4yODQzIDYuNzE1NzMgMzAgMTUgMzBaTTEwIDEwLjE1NzlWN0gyMFYyMkgxMFYxOC44NDIxSDE3LjA5MDlWMTAuMTU3OUgxMFpNMTAgMTIuOTIxMUgxNC43MjczVjE2LjA3ODlIMTBWMTIuOTIxMVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcikiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhciIgeDE9IjIuMTM2NDVlLTA3IiB5MT0iNC4yMTg3NSIgeDI9IjI3LjA2NjkiIHkyPSI2LjY0MDIzIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4MTlFRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNjQ4M0VCIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==",
+        "idSorting": 4,
+        "links": [
+          {
+            "tx": "https://explorer.decimalchain.com/transactions/",
+            "address": "https://explorer.decimalchain.com/address/",
+            "blockChain": "Decimal"
+          }
+        ],
+        "clientTxLimits": {
+          "minDeposit": "1",
+          "minWithdraw": "0.1",
+          "maxWithdraw": "1000000",
+          "withdrawCommissionFixed": "2"
+        }
+      },
+      "quoteCurrency": {
+        "id": 3,
+        "status": 1,
+        "symbol": "usdt",
+        "title": "Tether USD",
+        "logoURL": "https://cryptologos.cc/logos/tether-usdt-logo.png?v=010",
+        "isDiscount": false,
+        "address": "https://tether.to/",
+        "description": "Tether USD",
+        "decimals": 6,
+        "blockChain": "",
+        "precision": 6,
+        "currentRate": null,
+        "active": true,
+        "timeStart": "2021-01-28T09:04:17.170Z",
+        "txLimits": {
+          "minDeposit": "1000",
+          "maxWithdraw": "100000000000",
+          "minWithdraw": "1000000",
+          "withdrawCommissionFixed": {
+            "Tron": "2000000",
+            "Binance": "2000000000000000000",
+            "Ethereum": "20000000"
+          },
+          "withdrawCommissionPercentage": "NaN"
+        },
+        "type": "crypto",
+        "typeNetwork": "internalGW",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMTVDMCA2LjcxNTczIDYuNzE1NzMgMCAxNSAwVjBDMjMuMjg0MyAwIDMwIDYuNzE1NzMgMzAgMTVWMTVDMzAgMjMuMjg0MyAyMy4yODQzIDMwIDE1IDMwVjMwQzYuNzE1NzMgMzAgMCAyMy4yODQzIDAgMTVWMTVaIiBmaWxsPSIjNkZBNjg4Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMjMgN0g3VjExSDEzVjEyLjA2MkM4Ljk5MjAyIDEyLjMxNDYgNiAxMy4zMTAyIDYgMTQuNUM2IDE1LjY4OTggOC45OTIwMiAxNi42ODU0IDEzIDE2LjkzOFYyM0gxN1YxNi45MzhDMjEuMDA4IDE2LjY4NTQgMjQgMTUuNjg5OCAyNCAxNC41QzI0IDEzLjMxMDIgMjEuMDA4IDEyLjMxNDYgMTcgMTIuMDYyVjExSDIzVjdaTTcuNSAxNC41QzcuNSAxMy40NjA2IDkuMzMzMzMgMTIuMzY4IDEzIDEyLjA3NTZWMTUuNUgxN1YxMi4wNzU5QzIwLjkzODQgMTIuMzkyNyAyMi41IDEzLjYzMzkgMjIuNSAxNC41QzIyLjUgMTUuMzIyIDIwLjAwMDggMTUuODA2MSAxNyAxNS45NTI1QzE1LjcwODIgMTYuMDQ2MiAxMy43OTUxIDE1Ljk4MjYgMTMgMTUuOTM5MUM5Ljk5OTIxIDE1Ljc1NTkgNy41IDE1LjE4MDkgNy41IDE0LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+        "idSorting": 0,
+        "links": [
+          {
+            "tx": "https://etherscan.io/tx/",
+            "address": "https://etherscan.io/address/",
+            "blockChain": "Ethereum"
+          },
+          {
+            "tx": "https://tronscan.org/#/transaction/",
+            "address": "https://tronscan.org/#/address/",
+            "blockChain": "Tron"
+          },
+          {
+            "tx": "https://bscscan.com/tx/",
+            "address": "https://bscscan.com/address/",
+            "blockChain": "Binance"
+          }
+        ],
+        "clientTxLimits": {
+          "minDeposit": "0.001",
+          "minWithdraw": "1",
+          "maxWithdraw": "100000",
+          "withdrawCommissionPercentage": "NaN",
+          "withdrawCommissionFixed": {
+            "Tron": "2",
+            "Binance": "2",
+            "Ethereum": "20"
+          }
+        }
+      },
+      "quantities": {
+        "asks": "793826.49521394000087",
+        "bids": "33891.62718200289838"
+      }
+    }
+  }
+}

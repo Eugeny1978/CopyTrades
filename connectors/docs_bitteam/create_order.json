@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "result": {
+    "id": 105095334,
+    "userId": 19630,
+    "quantity": "260",
+    "pair": "del_usdt",
+    "side": "sell",
+    "price": "0.0195",
+    "executed": "0",
+    "executedPrice": "0",
+    "status": "created",
+    "baseDecimals": 18,
+    "quoteDecimals": 6,
+    "pairId": 24,
+    "type": "limit",
+    "stopPrice": null,
+    "slippage": null,
+    "timestamp": "1699629567"
+  }
+}

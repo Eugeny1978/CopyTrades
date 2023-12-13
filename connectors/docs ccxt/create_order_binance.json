@@ -1,0 +1,56 @@
+{
+  "info": {
+    "symbol": "ETHUSDT",
+    "orderId": "4306842",
+    "orderListId": "-1",
+    "clientOrderId": "x-R4BD3S828fca37cf31152427ce822b",
+    "transactTime": "1700469903784",
+    "price": "2100.00000000",
+    "origQty": "0.10000000",
+    "executedQty": "0.00000000",
+    "cummulativeQuoteQty": "0.00000000",
+    "status": "NEW",
+    "timeInForce": "GTC",
+    "type": "LIMIT",
+    "side": "SELL",
+    "workingTime": "1700469903784",
+    "fills": [],
+    "selfTradePreventionMode": "NONE"
+  },
+  "id": "4306842",
+  "clientOrderId": "x-R4BD3S828fca37cf31152427ce822b",
+  "timestamp": 1700469903784,
+  "datetime": "2023-11-20T08:45:03.784Z",
+  "lastTradeTimestamp": null,
+  "lastUpdateTimestamp": 1700469903784,
+  "symbol": "ETH/USDT",
+  "type": "limit",
+  "timeInForce": "GTC",
+  "postOnly": false,
+  "reduceOnly": null,
+  "side": "sell",
+  "price": 2100.0,
+  "triggerPrice": null,
+  "amount": 0.1,
+  "cost": 0.0,
+  "average": null,
+  "filled": 0.0,
+  "remaining": 0.1,
+  "status": "open",
+  "fee": {
+    "currency": null,
+    "cost": null,
+    "rate": null
+  },
+  "trades": [],
+  "fees": [
+    {
+      "currency": null,
+      "cost": null,
+      "rate": null
+    }
+  ],
+  "stopPrice": null,
+  "takeProfitPrice": null,
+  "stopLossPrice": null
+}

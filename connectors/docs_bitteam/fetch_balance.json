@@ -1,0 +1,203 @@
+{
+  "ok": true,
+  "result": {
+    "free": {
+      "ETH": "0",
+      "BTT": "0",
+      "BTC": "0",
+      "LTC": "0",
+      "PZM": "0",
+      "TRX": "0",
+      "BNB": "0",
+      "UFO": "0",
+      "BUSD": "0",
+      "LOCKER": "0",
+      "REV3L": "0",
+      "HBIT": "0",
+      "PEX": "0",
+      "VINU": "0",
+      "ZNX": "0",
+      "TON": "0",
+      "FLOKI": "0",
+      "ALTURA": "0",
+      "PMS": "0",
+      "DUSD": "0",
+      "OGZ": "0",
+      "USDT": "142.455758",
+      "DEL": "1584.03187203",
+      "FARMS": "0.00000001"
+    },
+    "used": {
+      "ETH": "0",
+      "BTT": "0",
+      "BTC": "0",
+      "LTC": "0",
+      "PZM": "0",
+      "TRX": "0",
+      "BNB": "0",
+      "UFO": "0",
+      "BUSD": "0",
+      "LOCKER": "0",
+      "REV3L": "0",
+      "HBIT": "0",
+      "PEX": "0",
+      "VINU": "0",
+      "ZNX": "0",
+      "TON": "0",
+      "FLOKI": "0",
+      "ALTURA": "0",
+      "PMS": "0",
+      "DUSD": "0",
+      "OGZ": "0",
+      "USDT": "0",
+      "DEL": "0",
+      "FARMS": "0"
+    },
+    "total": {
+      "ETH": "0",
+      "BTT": "0",
+      "BTC": "0",
+      "LTC": "0",
+      "PZM": "0",
+      "TRX": "0",
+      "BNB": "0",
+      "UFO": "0",
+      "BUSD": "0",
+      "LOCKER": "0",
+      "REV3L": "0",
+      "HBIT": "0",
+      "PEX": "0",
+      "VINU": "0",
+      "ZNX": "0",
+      "TON": "0",
+      "FLOKI": "0",
+      "ALTURA": "0",
+      "PMS": "0",
+      "DUSD": "0",
+      "OGZ": "0",
+      "USDT": "142.455758",
+      "DEL": "1584.03187203",
+      "FARMS": "0.00000001"
+    },
+    "ETH": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "BTT": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "BTC": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "LTC": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "PZM": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "TRX": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "BNB": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "UFO": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "BUSD": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "LOCKER": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "REV3L": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "HBIT": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "PEX": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "VINU": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "ZNX": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "TON": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "FLOKI": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "ALTURA": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "PMS": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "DUSD": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "OGZ": {
+      "free": "0",
+      "used": "0",
+      "total": "0"
+    },
+    "USDT": {
+      "free": "142.455758",
+      "used": "0",
+      "total": "142.455758"
+    },
+    "DEL": {
+      "free": "1584.03187203",
+      "used": "0",
+      "total": "1584.03187203"
+    },
+    "FARMS": {
+      "free": "0.00000001",
+      "used": "0",
+      "total": "0.00000001"
+    }
+  }
+}

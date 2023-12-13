@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "result": {
+    "count": 1,
+    "trades": [
+      {
+        "id": 34963762,
+        "tradeId": "3488368",
+        "makerOrderId": 107007160,
+        "takerOrderId": 107027880,
+        "pairId": 24,
+        "quantity": "10",
+        "price": "0.01751",
+        "isBuyerMaker": false,
+        "baseDecimals": 18,
+        "quoteDecimals": 6,
+        "side": "buy",
+        "timestamp": 1700815015,
+        "rewarded": true,
+        "makerUserId": 11250,
+        "takerUserId": 19630,
+        "baseCurrencyId": 9,
+        "quoteCurrencyId": 3,
+        "feeMaker": {
+          "amount": "0",
+          "symbol": "usdt",
+          "userId": 11250,
+          "decimals": 6,
+          "symbolId": 3,
+          "discountAmount": "0",
+          "discountSymbol": "btt",
+          "discountDecimals": 18,
+          "discountSymbolId": 5
+        },
+        "feeTaker": {
+          "amount": "0.02",
+          "symbol": "del",
+          "userId": 19630,
+          "decimals": 18,
+          "symbolId": 9
+        },
+        "pair": "del_usdt",
+        "createdAt": "2023-11-24T08:36:55.408Z",
+        "updatedAt": "2023-11-24T08:40:00.227Z"
+      }
+    ]
+  }
+}

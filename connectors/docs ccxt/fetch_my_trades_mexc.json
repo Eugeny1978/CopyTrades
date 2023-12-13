@@ -1,0 +1,42 @@
+[
+{
+  "id": "138bc10bdaaa4737b166eec04df7d92a",
+  "order": "C01__355307382294777859",
+  "timestamp": 1700494117000,
+  "datetime": "2023-11-20T15:28:37.000Z",
+  "symbol": "MX/USDT",
+  "type": null,
+  "side": "buy",
+  "takerOrMaker": "taker",
+  "price": 2.89,
+  "amount": 3.8,
+  "cost": 10.982,
+  "fee": {
+    "cost": 0.0,
+    "currency": "USDT"
+  },
+  "info": {
+    "symbol": "MXUSDT",
+    "id": "138bc10bdaaa4737b166eec04df7d92a",
+    "orderId": "C01__355307382294777859",
+    "orderListId": "-1",
+    "price": "2.89",
+    "qty": "3.8",
+    "quoteQty": "10.982",
+    "commission": "0",
+    "commissionAsset": "USDT",
+    "time": "1700494117000",
+    "isBuyer": true,
+    "isMaker": false,
+    "isBestMatch": true,
+    "isSelfTrade": false,
+    "clientOrderId": null
+  },
+  "fees": [
+    {
+      "cost": 0.0,
+      "currency": "USDT"
+    }
+  ]
+}
+]
