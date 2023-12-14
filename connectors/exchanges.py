@@ -29,6 +29,10 @@ class Exchanges:
         'Mexc': ccxt.mexc,
         'ByBit': ccxt.bybit
     }
+    # Способ подключения к бирже используя getattr
+    # id = 'binance'
+    # exchange = getattr(ccxt, id)()
+    # print(exchange.has)
 
     def __connect_exchange(self, name_exchange, keys={}):
         connect = self.connects[name_exchange](keys)
@@ -51,7 +55,13 @@ class Exchanges:
         return client_connects
 
 
-    def get_patron_orders(self):
+    def get_patron_orders(self, symbol=None):
+        orders = self.patron_exchange.fetch_orders(symbol=symbol)
+        return orders
+
+    def get_client_orders(self):
+        pass
+
 
 
 
