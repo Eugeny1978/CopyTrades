@@ -56,7 +56,7 @@ class Exchanges:
 
 
     def get_patron_orders(self, symbol=None):
-        orders = self.patron_exchange.fetch_orders(symbol=symbol)
+        orders = self.patron_exchange.fetch_orders(symbol=symbol) # если
         return orders
 
     def get_client_orders(self):

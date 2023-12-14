@@ -243,5 +243,15 @@ class BitTeam(): # Request
             payloads['pairId'] = self.__get_pairId_database(self.format_symbol(symbol))
         return self.__request(path=f'/ccxt/tradesOfUser', params=payloads)
 
-# class AuthorizationException(Exception):
-#     print('Ошибка Авторизации. Задайте/Проверьте Публичный и Секретный АПИ Ключи')
+
+    def fetch_ledger(self, limit=1000, offset=0): # fetch_transactions  # fetchLedger
+        """
+        {{baseUrl}}/trade/api/transactionsOfUser?limit=10&offset=0
+        :return:
+        """
+        if not self.auth: self.authorization()
+        payloads = {
+            'limit': limit,
+            'offset': offset
+        }
+        return self.__request(path='/transactionsOfUser', params=payloads)
