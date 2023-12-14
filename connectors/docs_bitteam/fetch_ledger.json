@@ -1,0 +1,434 @@
+{
+  "ok": true,
+  "result": {
+    "count": 3949,
+    "transactions": [
+      {
+        "id": 1334090,
+        "orderId": null,
+        "transactionCoreId": "566150",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 9,
+        "CommissionId": null,
+        "amount": "933709679",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35896822,
+          "rewardedFor": "Sergius777",
+          "rewardedForId": 16511
+        },
+        "reason": null,
+        "timestamp": 1702490400071,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 1.129244183774e+22,
+        "after": 1.130177893453e+22,
+        "currency": {
+          "symbol": "del",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333855,
+        "orderId": null,
+        "transactionCoreId": "565933",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 3,
+        "CommissionId": null,
+        "amount": "6800",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35849263,
+          "rewardedFor": "Luchnik",
+          "rewardedForId": 19630
+        },
+        "reason": null,
+        "timestamp": 1702379100103,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 1334019790,
+        "after": 1334026590,
+        "currency": {
+          "symbol": "usdt",
+          "decimals": 6,
+          "blockChain": "",
+          "links": [
+            {
+              "tx": "https://etherscan.io/tx/",
+              "address": "https://etherscan.io/address/",
+              "blockChain": "Ethereum"
+            },
+            {
+              "tx": "https://tronscan.org/#/transaction/",
+              "address": "https://tronscan.org/#/address/",
+              "blockChain": "Tron"
+            },
+            {
+              "tx": "https://bscscan.com/tx/",
+              "address": "https://bscscan.com/address/",
+              "blockChain": "Binance"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333854,
+        "orderId": null,
+        "transactionCoreId": "565931",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 3,
+        "CommissionId": null,
+        "amount": "1700",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35849262,
+          "rewardedFor": "Luchnik",
+          "rewardedForId": 19630
+        },
+        "reason": null,
+        "timestamp": 1702379100101,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 1334018090,
+        "after": 1334019790,
+        "currency": {
+          "symbol": "usdt",
+          "decimals": 6,
+          "blockChain": "",
+          "links": [
+            {
+              "tx": "https://etherscan.io/tx/",
+              "address": "https://etherscan.io/address/",
+              "blockChain": "Ethereum"
+            },
+            {
+              "tx": "https://tronscan.org/#/transaction/",
+              "address": "https://tronscan.org/#/address/",
+              "blockChain": "Tron"
+            },
+            {
+              "tx": "https://bscscan.com/tx/",
+              "address": "https://bscscan.com/address/",
+              "blockChain": "Binance"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333776,
+        "orderId": "24b9bdab-df12-4a26-92ae-564f0bdb5a6f",
+        "transactionCoreId": "565855",
+        "userId": 3111,
+        "recipient": "d01zsnn3r699d0w9u4u6eqhmc2fwuyrk07vzd7rh9",
+        "sender": "d016fmek45n0atmfmqzv8wevquy3mp4l4pgat7v47",
+        "symbolId": 9,
+        "CommissionId": 17967,
+        "amount": "14705000000000000000000",
+        "params": {
+          "tx_id": "CAEBB96CE42B26FFEEE9D7F9EADD38B5C93D06884B2DAE7EF3FB67DE894EB6B3"
+        },
+        "reason": null,
+        "timestamp": 1702307328512,
+        "status": "success",
+        "statusDescription": null,
+        "type": "withdraw",
+        "message": null,
+        "blockChain": "",
+        "before": 1.129244183774e+22,
+        "after": 1.129244183774e+22,
+        "currency": {
+          "symbol": "del",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333767,
+        "orderId": null,
+        "transactionCoreId": "565850",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 5,
+        "CommissionId": null,
+        "amount": "6128152093",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35809065,
+          "rewardedFor": "Sergius777",
+          "rewardedForId": 16511
+        },
+        "reason": null,
+        "timestamp": 1702299300098,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 3.81343625254e+21,
+        "after": 3.87471777347e+21,
+        "currency": {
+          "symbol": "btt",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333626,
+        "orderId": null,
+        "transactionCoreId": "565712",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 5,
+        "CommissionId": null,
+        "amount": "729241573",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35773850,
+          "rewardedFor": "yuriy60",
+          "rewardedForId": 14770
+        },
+        "reason": null,
+        "timestamp": 1702235700102,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 3.80614383681e+21,
+        "after": 3.81343625254e+21,
+        "currency": {
+          "symbol": "btt",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333623,
+        "orderId": null,
+        "transactionCoreId": "565709",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 5,
+        "CommissionId": null,
+        "amount": "17384831460",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35773835,
+          "rewardedFor": "Sergius777",
+          "rewardedForId": 16511
+        },
+        "reason": null,
+        "timestamp": 1702235700096,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 3.63229552221e+21,
+        "after": 3.80614383681e+21,
+        "currency": {
+          "symbol": "btt",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333622,
+        "orderId": null,
+        "transactionCoreId": "565708",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 3,
+        "CommissionId": null,
+        "amount": "3856",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35773833,
+          "rewardedFor": "samoho",
+          "rewardedForId": 16285
+        },
+        "reason": null,
+        "timestamp": 1702235700095,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 1603920500,
+        "after": 1603924356,
+        "currency": {
+          "symbol": "usdt",
+          "decimals": 6,
+          "blockChain": "",
+          "links": [
+            {
+              "tx": "https://etherscan.io/tx/",
+              "address": "https://etherscan.io/address/",
+              "blockChain": "Ethereum"
+            },
+            {
+              "tx": "https://tronscan.org/#/transaction/",
+              "address": "https://tronscan.org/#/address/",
+              "blockChain": "Tron"
+            },
+            {
+              "tx": "https://bscscan.com/tx/",
+              "address": "https://bscscan.com/address/",
+              "blockChain": "Binance"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333572,
+        "orderId": null,
+        "transactionCoreId": "565661",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 5,
+        "CommissionId": null,
+        "amount": "2760566880",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35750850,
+          "rewardedFor": "Sergius777",
+          "rewardedForId": 16511
+        },
+        "reason": null,
+        "timestamp": 1702194000087,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 3.60468985341e+21,
+        "after": 3.63229552221e+21,
+        "currency": {
+          "symbol": "btt",
+          "decimals": 18,
+          "blockChain": "Decimal",
+          "links": [
+            {
+              "tx": "https://explorer.decimalchain.com/transactions/",
+              "address": "https://explorer.decimalchain.com/address/",
+              "blockChain": "Decimal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1333383,
+        "orderId": null,
+        "transactionCoreId": "565474",
+        "userId": 3111,
+        "recipient": "3111",
+        "sender": null,
+        "symbolId": 3,
+        "CommissionId": null,
+        "amount": "29677",
+        "params": {
+          "level": 1,
+          "txType": "reward",
+          "tradeId": 35669268,
+          "rewardedFor": "23Fedorec",
+          "rewardedForId": 16366
+        },
+        "reason": null,
+        "timestamp": 1702035600081,
+        "status": "success",
+        "statusDescription": null,
+        "type": "deposit",
+        "message": null,
+        "blockChain": null,
+        "before": 1221656409,
+        "after": 1221686086,
+        "currency": {
+          "symbol": "usdt",
+          "decimals": 6,
+          "blockChain": "",
+          "links": [
+            {
+              "tx": "https://etherscan.io/tx/",
+              "address": "https://etherscan.io/address/",
+              "blockChain": "Ethereum"
+            },
+            {
+              "tx": "https://tronscan.org/#/transaction/",
+              "address": "https://tronscan.org/#/address/",
+              "blockChain": "Tron"
+            },
+            {
+              "tx": "https://bscscan.com/tx/",
+              "address": "https://bscscan.com/address/",
+              "blockChain": "Binance"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
