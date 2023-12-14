@@ -1,7 +1,7 @@
 import requests                                 # Библиотека для создания и обработки запросов
 import sqlite3 as sq                            # Библиотека  Работа с БД
 from typing import Literal                      # Создание Классов Перечислений
-from data_bases.path_to_base import DATABASE    # Путь к БД (хранение/запись Доступных Торгуемых Пар и их значений)
+from data_base.path_to_base import DATABASE    # Путь к БД (хранение/запись Доступных Торгуемых Пар и их значений)
 
 # Допустимый Формат Написания Торговых Пар (Символов)
 # symbol='del_usdt' - родной

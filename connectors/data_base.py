@@ -1,6 +1,7 @@
-import sqlite3 as sq           # Работа с БД
-import pandas as pd            # Преобразование в ДатаФремы (Таблицы)
+import sqlite3 as sq                        # Работа с БД
+import pandas as pd                         # Преобразование в ДатаФремы (Таблицы)
 from data_base.path_to_base import DATABASE # Путь к Базе Данных
+from .logic_errors import LogicErrors       # Ошибки
 
 class DataBaseRequests:
     """
@@ -23,7 +24,7 @@ class DataBaseRequests:
             curs.execute(f"SELECT name, exchange, apiKey, secret FROM Patrons WHERE status LIKE 'Active'")
             responce = curs.fetchone()
             if not responce:
-                raise DataBaseErrors('Не найден Аккаунт-ПАТРОН')
+                raise LogicErrors('База Данных: Не найден Аккаунт-ПАТРОН')
             patron = pd.DataFrame(columns=self.patron_columns)
             patron.loc[len(patron)] = (responce)
             return patron
@@ -35,21 +36,12 @@ class DataBaseRequests:
             curs.execute(f"SELECT name, exchange, apiKey, secret, rate FROM Clients WHERE status LIKE 'Active'")
             responce = curs.fetchall()
             if not responce:
-                raise DataBaseErrors('Не найдены Аккаунты-Клиенты')
+                raise LogicErrors('База Данных: Не найдены Аккаунты-Клиенты')
             clients = pd.DataFrame(columns=self.client_columns)
             for row in responce:
                 clients.loc[len(clients)] = (row)
             return clients
 
 # -----------------------------------------------------------------------------------------------
-class DataBaseErrors(Exception):
 
-    def __init__(self, *args):
-        self.message = args[0] if args else None
-
-    def __str__(self):
-        if self.message:
-            return '| DataBaseError, {0} |'.format(self.message)
-        else:
-            return '| Ошибка класса DataBaseError |'
 
