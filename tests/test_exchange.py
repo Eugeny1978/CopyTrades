@@ -13,8 +13,18 @@ div_line = '--------------------------------------------------------------------
 def print_json(data):
     print(json.dumps(data))
 
-
+# Получаю Первичные Данные (Патрон, Клиенты)
 exchanges = Exchanges()
+
+# Получаю Агрегированную Таблицу Ордеров Патрона
+patron_orders = exchanges.get_account_orders(exchanges.patron_exchange)
+
+# Формирую Словарь Агрегированных Таблиц Ордеров для копирования Клиентами
+ordertables_for_copy_clients = exchanges.get_ordertables_for_copy_clients(patron_orders)
+
+# Создаю Ордера по каждому клиенту
+
+
 
 # print_json(exchanges.patron_exchange.has)
 
@@ -33,22 +43,27 @@ exchanges = Exchanges()
 # # [print(client_exchange.fetch_balance(), sep='\n') for client_name, client_exchange in exchanges.client_exchanges.items()]
 
 # Открытые Ордера
-patron_orders = exchanges.get_account_orders(exchanges.patron_exchange)
-print(patron_orders)
+# patron_orders = exchanges.get_account_orders(exchanges.patron_exchange)
+# print(patron_orders)
 
-for client_exchange in exchanges.client_exchanges.values():
-    client_orders = exchanges.get_account_orders(client_exchange)
-    print(client_orders)
-
-# ddd = {
-#     'name1': 'val1',
-#     'name2': 'val2',
-#     'name3': 'val3',
-#     'name4': 'val4',
-#     'name5': 'val5',
-# }
+# for client_exchange in exchanges.client_exchanges.values():
+#     index = 0
+#     client_orders = exchanges.get_account_orders(client_exchange)
+#     client_orders['amount'] = -client_orders['amount']
+#     print(client_orders, div_line, sep='\n')
 #
-# print(*ddd)
+#     template_orders = patron_orders.copy()
+#     template_orders['amount'] = template_orders['amount'] * exchanges.data_base.clients['rate'][index]
+#     print(patron_orders, div_line, sep='\n')
+#     print(template_orders, div_line, sep='\n')
+#     index +=1
+
+# exchanges.client_exchanges['Constantin_ByBit'].create_order(SYMBOL, type='limit', side='buy', price=10, amount=1.7)
+# print_json(exchanges.client_exchanges['Constantin_ByBit'].fetch_open_orders(SYMBOL))
+
+# ordertables_for_copy_clients = exchanges.get_ordertables_for_copy_clients(patron_orders)
+# print(ordertables_for_copy_clients)
+
 
 
 

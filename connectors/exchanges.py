@@ -8,6 +8,7 @@ from connectors.logic_errors import LogicErrors
 PAUSE = 1 # Пауза между Запросами
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT', 'LINK/USDT')
 ORDER_COLUMNS = ('symbol', 'type', 'side', 'price', 'amount')
+div_line = '-----------------------------------------------------------------------------------------------------'
 
 class Exchanges:
     """
@@ -15,9 +16,9 @@ class Exchanges:
     2. Создать Подключение к Аккаунту Патрона
     3. Создать Подключения к Аккаунтам Клиентов
 
-    2. Получить Лимитные Ордера Патрона (Таблицу Агрегированную по Price + (Buy Sell))
+    4. Получить Лимитные Ордера Аккаунта (Таблицу Агрегированную по Price + (Buy Sell))
+    5. Сравнить Агрегированные Ордера Патрона с Клиентом
 
-    3. Получить Лимитные Ордера Клиентов (Таблицу Агрегированную по Price + (Buy Sell))
     Сравнить Таблицу Ордера
     """
 
@@ -77,7 +78,24 @@ class Exchanges:
             df.loc[len(df)] = [order['symbol'], order['type'], order['side'], order['price'], order['remaining']]
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
+    def get_ordertables_for_copy_clients(self, patron_orders):
+        ordertables_for_copy_clients = {}
 
+        for client_name, client_exchange in self.client_exchanges.items():
+            index = 0
+            template_orders = patron_orders.copy()
+            template_orders['amount'] = template_orders['amount'] * self.data_base.clients['rate'][index]
+
+            client_orders = self.get_account_orders(client_exchange)
+            client_orders['amount'] = -client_orders['amount']
+            table_for_copy = pd.concat([template_orders, client_orders])
+            agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+            ordertables_for_copy_clients[client_name] = agg_table_for_copy
+            print(agg_table_for_copy)
+            index += 1
+
+        self.ordertables_for_copy_clients = ordertables_for_copy_clients
+        return ordertables_for_copy_clients
 
 
 
