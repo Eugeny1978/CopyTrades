@@ -6,6 +6,8 @@ from connectors.data_base import DataBaseRequests
 from connectors.logic_errors import LogicErrors
 
 PAUSE = 1 # Пауза между Запросами
+SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT', 'LINK/USDT')
+ORDER_COLUMNS = ('symbol', 'type', 'side', 'price', 'amount')
 
 class Exchanges:
     """
@@ -14,6 +16,7 @@ class Exchanges:
     3. Создать Подключения к Аккаунтам Клиентов
 
     2. Получить Лимитные Ордера Патрона (Таблицу Агрегированную по Price + (Buy Sell))
+
     3. Получить Лимитные Ордера Клиентов (Таблицу Агрегированную по Price + (Buy Sell))
     Сравнить Таблицу Ордера
     """
@@ -54,13 +57,29 @@ class Exchanges:
             sleep(PAUSE)
         return client_connects
 
+    def get_account_orders(self, exchange):
+        orders = []
+        for symbol in SYMBOLS:
+            order_list = exchange.fetch_open_orders(symbol)
+            for order in order_list:
+                orders.append(order)
+        return self.convert_orders_to_df(orders)
+        # Получается глубокий список (список в с писке)
+        # order_list = [self.patron_exchange.fetch_open_orders(symbol) for symbol in SYMBOLS]
+        # orders = [order for order in order_list]
+        # return orders
 
-    def get_patron_orders(self, symbol=None):
-        orders = self.patron_exchange.fetch_orders(symbol=symbol) # если
-        return orders
+    def convert_orders_to_df(self, orders):
+        # ('symbol', 'type', 'side', 'price', 'amount')
+        df = pd.DataFrame(columns=ORDER_COLUMNS)
+        for order in orders:
+            # для BitTeam - другие Столбцы
+            df.loc[len(df)] = [order['symbol'], order['type'], order['side'], order['price'], order['remaining']]
+        return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
-    def get_client_orders(self):
-        pass
+
+
+
 
 
 

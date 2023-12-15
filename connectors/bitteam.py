@@ -189,8 +189,9 @@ class BitTeam(): # Request
         if not self.auth: self.authorization()
         return self.__request(path=f'/ccxt/order/{order_id}')
 
-    def fetch_orders(self, symbol=None, since=None, limit=1000, type:UserOrderTypes='active', offset=0, order='', where=''):
+    def fetch_orders(self, symbol=None, since=None, limit=1000, type:UserOrderTypes='all', offset=0, order='', where=''):
         """
+        Хринит Информацию за последние 3 суток (судя по тестам)
         fetch_orders(self, symbol: Optional[str] = None, since: Optional[int] = None, limit: Optional[int] = None, params={})
         Ордера за Текущую Дату
         type= 'history', 'active', 'closed', 'cancelled', 'all'| history = closed + cancelled
@@ -223,6 +224,16 @@ class BitTeam(): # Request
                 count += 1
         self.data['result']['orders'] = data_orders
         self.data['result']['count'] = count
+
+    def fetch_open_orders(self, symbol=None, since=None, limit=1000, offset=0):
+        """
+        Открытые (Активные Ордера) - для совместимости с ccxt
+        Хвляется частныи случаем
+        fetch_orders(self, symbol=None, since=None, limit=1000, type:UserOrderTypes='all', offset=0, order='', where='')
+        type:UserOrderTypes='active'
+        """
+        return self.fetch_orders(symbol=symbol, since=since, limit=limit, type='active', offset=offset) #
+
 
     def fetch_my_trades(self, symbol=0, limit=10, offset=0, order=''):
         """

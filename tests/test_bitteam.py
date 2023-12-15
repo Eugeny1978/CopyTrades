@@ -35,6 +35,9 @@ def get_apikeys(account_name):
 apikeys = get_apikeys(ACCOUNT)
 exchange = BitTeam(apikeys)
 
+def print_json(data):
+    print(json.dumps(data))
+
 # balance = exchange.fetch_balance()
 # print(balance)
 # print(div_line)
@@ -80,8 +83,12 @@ exchange = BitTeam(apikeys)
 # trades = exchange.fetch_my_trades(SYMBOL_1)
 # print(trades)
 
-transactions = exchange.fetch_ledger(limit=10)
-print(json.dumps(transactions))
+# transactions = exchange.fetch_ledger(limit=10)
+# # print(json.dumps(transactions))
+
+open_orders = exchange.fetch_open_orders(limit=10)
+print_json(open_orders)
+
 
 
 
