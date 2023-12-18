@@ -130,25 +130,12 @@ class Exchanges:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def get_balance(self):
-        balance = self.exchange.fetch_balance()
+    def get_balance(self, exchange):
+        balance = exchange.fetch_balance()
         indexes = ['free', 'used', 'total']
         columns = [balance['free'], balance['used'], balance['total']]
         df = pd.DataFrame(columns, index=indexes)
-        if self.data_base.exchange == 'BitTeam':
+        if exchange == BitTeam:
             df = df.astype(float)
         df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
         return df_compact

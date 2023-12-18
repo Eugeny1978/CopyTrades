@@ -3,8 +3,8 @@ import ccxt
 import json
 import pandas as pd
 
-SYMBOL = 'ATOM/USDT'
-SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
+# SYMBOL = 'ATOM/USDT'
+# SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 
 pd.options.display.width= None # Отображение Таблицы на весь Экран
 pd.options.display.max_columns= 20 # Макс Кол-во Отображаемых Колонок
