@@ -78,9 +78,12 @@ class Exchanges:
             df.loc[len(df)] = [order['symbol'], order['type'], order['side'], order['price'], order['remaining']]
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
+    def get_patron_ordertable(self):
+        self.patron_orders = self.get_account_orders(self.patron_exchange)
+        return self.patron_orders
+
     def get_ordertables_for_copy_clients(self, patron_orders):
         ordertables_for_copy_clients = {}
-
         for client_name, client_exchange in self.client_exchanges.items():
             index = 0
             template_orders = patron_orders.copy()
@@ -93,9 +96,36 @@ class Exchanges:
             ordertables_for_copy_clients[client_name] = agg_table_for_copy
             print(agg_table_for_copy)
             index += 1
-
-        self.ordertables_for_copy_clients = ordertables_for_copy_clients
         return ordertables_for_copy_clients
+
+    def copy_orders(self, ordertables_for_copy_clients):
+
+        for exchange_name, table in ordertables_for_copy_clients.iterrows():
+            if not len(table): continue # пустая таблица - ничего корректировать не надо
+            for order in table:
+                client_exchange = self.client_exchanges[exchange_name]
+                if order['amount'] > 0: # не хватает - выставляю ордер
+                    order_amount = order['amount']
+                else: # отрицательн значение - необходимо урезать.
+                    # Предварительно сниму все ордера по этому символу с этой ценой
+                    self.cancel_orders_with_price(client_exchange, order['symbol'], order['side'], order['price'])
+                    # Выставлю одним ордером Полный объем ориентируясь на таблицу ордеров патрона.
+                    order_amount = 0 # прописать полный объем по данной цене
+                client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
+
+
+    def __get_orders_with_price(self, client_exchange, symbol, side, price):
+        all_orders = client_exchange.fetch_open_orders(symbol)
+        price_orders = []
+        for order in all_orders:
+            if order['side'] == side and order['price'] == price:
+                temp_order = {'id': order['id'], 'side': order['side'], 'price': order['price']}
+                price_orders.append(temp_order)
+        print(f'Биржа: {client_exchange}. | Будут Отменены Ордера для Цены: {price}:', price_orders, sep='\n')
+        return price_orders
+
+    def cancel_orders_with_price(self, client_exchange, symbol, side, price):
+        price_orders = self.__get_orders_with_price(client_exchange, symbol, side, price)
 
 
 
