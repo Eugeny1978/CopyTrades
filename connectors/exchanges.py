@@ -106,7 +106,7 @@ class Exchanges:
             client_name = self.data_base.clients['name'][account_db_index]
             print(div_line, f'Копирование Аккаунта: {client_name} | Биржа: {exchange_name}', sep='\n')
             if not len(table):
-                print('Ордера НЕ нуждаются в Корректировке')
+                print('Ордера НЕ нуждаются в Корректировке', div_line, sep='\n')
                 account_db_index += 1
                 continue # пустая таблица - ничего корректировать не надо
             print(f'Таблица для Корректировки Ордеров: | Mount - разница между необходимым Объемом и Текущим', table, sep='\n')
@@ -123,6 +123,7 @@ class Exchanges:
                         client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
                     except:
                         print('!!! ОШИБКА при Попытке Создать Ордер. | Скорее всего НЕ Хватает средств на счету')
+            print(div_line)
             account_db_index += 1
             sleep(ACCOUNT_PAUSE)
 
