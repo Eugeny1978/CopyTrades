@@ -100,9 +100,12 @@ class Exchanges:
 
     def copy_orders(self, ordertables_for_copy_clients):
 
-        for exchange_name, table in ordertables_for_copy_clients.iterrows():
-            if not len(table): continue # пустая таблица - ничего корректировать не надо
-            for order in table:
+        for exchange_name, table in ordertables_for_copy_clients.items():
+            account_db_index = 0
+            if not len(table):
+                account_db_index += 1
+                continue # пустая таблица - ничего корректировать не надо
+            for index, order in table.iterrows():
                 client_exchange = self.client_exchanges[exchange_name]
                 if order['amount'] > 0: # не хватает - выставляю ордер
                     order_amount = order['amount']
@@ -110,25 +113,40 @@ class Exchanges:
                     # Предварительно сниму все ордера по этому символу с этой ценой
                     self.cancel_orders_with_price(client_exchange, order['symbol'], order['side'], order['price'])
                     # Выставлю одним ордером Полный объем ориентируясь на таблицу ордеров патрона.
-                    order_amount = 0 # прописать полный объем по данной цене
-                client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
+                    # account_rate = self.get_account_rate('')
+                    order_amount = self.get_amount_price_patron_orders(order['symbol'], order['side'], order['price'], account_db_index) # прописать полный объем по данной цене
+                if order_amount: # если есть объем по данной цене и side
+                    client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
+            account_db_index += 1
 
-
-    def __get_orders_with_price(self, client_exchange, symbol, side, price):
+    def get_orders_with_price(self, client_exchange, symbol, side, price):
+        """
+        Только Лимитные Ордера
+        """
         all_orders = client_exchange.fetch_open_orders(symbol)
         price_orders = []
         for order in all_orders:
-            if order['side'] == side and order['price'] == price:
+            if order['side'] == side and order['price'] == price and order['type'] == 'limit':
                 temp_order = {'id': order['id'], 'side': order['side'], 'price': order['price']}
                 price_orders.append(temp_order)
-        print(f'Биржа: {client_exchange}. | Будут Отменены Ордера для Цены: {price}:', price_orders, sep='\n')
         return price_orders
 
     def cancel_orders_with_price(self, client_exchange, symbol, side, price):
-        price_orders = self.__get_orders_with_price(client_exchange, symbol, side, price)
+        price_orders = self.get_orders_with_price(client_exchange, symbol, side, price)
+        print(f'Биржа: {client_exchange}. | Будут Отменены Ордера "{side.upper()}" для Цены: {price}:', *price_orders, sep='\n')
+        for order in price_orders:
+            client_exchange.cancel_order(order['id'], symbol)
 
-
-
+    def get_amount_price_patron_orders(self, symbol, side, price, account_db_index):
+        patron = self.patron_orders
+        account_rate = self.data_base.clients['rate'][account_db_index]
+        filter = f"symbol == '{symbol}' and type == 'limit' and side == '{side}' and price == {price}"
+        row_order = patron.query(filter)
+        if len(row_order):
+            amount = patron.query(filter)['amount'][0] * account_rate
+        else:
+            amount = 0
+        return amount
 
     def get_balance(self, exchange):
         balance = exchange.fetch_balance()
