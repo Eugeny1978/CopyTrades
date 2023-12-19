@@ -38,3 +38,4 @@ for exchange_name, client_exchange in exchanges.client_exchanges.items():
 ordertables_for_copy_clients = exchanges.get_ordertables_for_copy_clients(patron_orders)
 for table in ordertables_for_copy_clients:
     print_p(table)
+
