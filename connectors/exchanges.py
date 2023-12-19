@@ -1,5 +1,6 @@
 from time import sleep
 import pandas as pd
+import numpy as np
 import ccxt                                                 # Объекты DataFrame
 from connectors.bitteam import BitTeam
 from connectors.data_base import DataBaseRequests
@@ -93,6 +94,9 @@ class Exchanges:
             client_orders['amount'] = -client_orders['amount']
             table_for_copy = pd.concat([template_orders, client_orders])
             agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+            round_amounts = np.round(agg_table_for_copy['amount'], decimals=6)
+            agg_table_for_copy['amount'] = round_amounts
+            agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
             ordertables_for_copy_clients[client_name] = agg_table_for_copy
             print(agg_table_for_copy)
             index += 1
