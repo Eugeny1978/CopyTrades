@@ -9,8 +9,8 @@ class DataBaseRequests:
     1. Получить Аккаунт-Патрон
     2. Получить Аккунты-Клиенты
     """
-    patron_columns = ('name', 'exchange', 'apiKey', 'secret')
-    client_columns = ('name', 'exchange', 'apiKey', 'secret', 'rate')
+    patron_columns = ('name', 'exchange', 'apiKey', 'secret', 'password')
+    client_columns = ('name', 'exchange', 'apiKey', 'secret', 'password', 'rate')
 
     def __init__(self):
         self.patron = self.__get_patron()
@@ -21,7 +21,7 @@ class DataBaseRequests:
         with sq.connect(DATABASE) as connect:
             connect.row_factory = sq.Row  # Строки записей в виде dict {}. По умолчанию - кортежи turple ()
             curs = connect.cursor()
-            curs.execute(f"SELECT name, exchange, apiKey, secret FROM Patrons WHERE status LIKE 'Active'")
+            curs.execute(f"SELECT name, exchange, apiKey, secret, password FROM Patrons WHERE status LIKE 'Active'")
             responce = curs.fetchone()
             if not responce:
                 raise LogicErrors('База Данных: Не найден Аккаунт-ПАТРОН')
@@ -33,7 +33,7 @@ class DataBaseRequests:
         with sq.connect(DATABASE) as connect:
             connect.row_factory = sq.Row  # Строки записей в виде dict {}. По умолчанию - кортежи turple ()
             curs = connect.cursor()
-            curs.execute(f"SELECT name, exchange, apiKey, secret, rate FROM Clients WHERE status LIKE 'Active'")
+            curs.execute(f"SELECT name, exchange, apiKey, secret, password, rate FROM Clients WHERE status LIKE 'Active'")
             responce = curs.fetchall()
             if not responce:
                 raise LogicErrors('База Данных: Не найдены Аккаунты-Клиенты')

@@ -8,7 +8,7 @@ from connectors.logic_errors import LogicErrors     # Обработка Лог�
 
 PAUSE = 1           # Пауза между Запросами
 ACCOUNT_PAUSE = 5   # Пауза между Обработкой Клиентов
-SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT', 'LINK/USDT')  # Сравнение по Торгуемым Парам
+SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')  # Сравнение по Торгуемым Парам
 ORDER_COLUMNS = ('symbol', 'type', 'side', 'price', 'amount') # Колонки для ДатаФремов
 div_line = '-----------------------------------------------------------------------------------------------------'
 
@@ -32,7 +32,9 @@ class Exchanges:
         'BitTeam': BitTeam,
         'Binance': ccxt.binance,
         'Mexc': ccxt.mexc,
-        'ByBit': ccxt.bybit
+        'ByBit': ccxt.bybit,
+        'Okx': ccxt.okx,
+        'Gate_io': ccxt.gateio
     }
     # Способ подключения к бирже используя getattr
     # id = 'binance'
@@ -47,14 +49,17 @@ class Exchanges:
 
     def __connect_patron(self):
         name_exchange = self.data_base.patron['exchange'][0]
-        keys = {'apiKey': self.data_base.patron['apiKey'][0], 'secret': self.data_base.patron['secret'][0]}
+        keys = {'apiKey': self.data_base.patron['apiKey'][0],
+                'secret': self.data_base.patron['secret'][0],
+                'password': self.data_base.patron['password'][0],
+                }
         return self.__connect_exchange(name_exchange, keys)
 
     def __connect_clients(self):
         client_connects = {}
         for index, client in self.data_base.clients.iterrows():
             name_exchange = client['exchange']
-            keys = {'apiKey': client['apiKey'], 'secret': client['secret']}
+            keys = {'apiKey': client['apiKey'], 'secret': client['secret'], 'password': client['password']}
             client_connects[client['name']] = self.__connect_exchange(name_exchange, keys)
             sleep(PAUSE)
         return client_connects
@@ -85,8 +90,8 @@ class Exchanges:
 
     def get_ordertables_for_copy_clients(self, patron_orders):
         ordertables_for_copy_clients = {}
+        index = 0
         for client_name, client_exchange in self.client_exchanges.items():
-            index = 0
             template_orders = patron_orders.copy()
             template_orders['amount'] = template_orders['amount'] * self.data_base.clients['rate'][index]
             client_orders = self.get_account_orders(client_exchange)
@@ -101,8 +106,8 @@ class Exchanges:
         return ordertables_for_copy_clients
 
     def copy_orders(self, ordertables_for_copy_clients):
+        account_db_index = 0
         for exchange_name, table in ordertables_for_copy_clients.items():
-            account_db_index = 0
             client_name = self.data_base.clients['name'][account_db_index]
             print(div_line, f'Копирование Аккаунта: {client_name} | Биржа: {exchange_name}', sep='\n')
             if not len(table):
