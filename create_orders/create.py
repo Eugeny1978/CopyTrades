@@ -10,7 +10,7 @@ div_line = '--------------------------------------------------------------------
 
 # Работаю с Аккаунтом
 ACCOUNT =  'Constantin_Gate' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
-DB_TABLE = 'Clients' # 'Patrons'
+DB_TABLE = 'Clients' # 'Patrons' 'Clients'
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 
 connects = {
@@ -47,6 +47,11 @@ def get_balance(exchange):
 def main():
     account = get_data_account()
     exchange = connects[account['exchange']](account['keys'])
+
+    # # 'Luchnik_ByBit'
+    # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=2.2, price=10.7)
+    # exchange.create_market_order(symbol='ETH/USDT', side='buy', amount=0.015, price=2200)
+    # exchange.create_market_order(symbol='BTC/USDT', side='buy', amount=0.00075, price=43500)
 
     # # 'Constantin_ByBit'
     # exchange.create_market_sell_order(symbol='SOL/USDT', amount=1.1279)
