@@ -10,8 +10,9 @@ div_line = '--------------------------------------------------------------------
 
 # Работаю с Аккаунтом
 ACCOUNT =  'Constantin_Gate' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
-DB_TABLE = 'Clients' # 'Patrons' 'Clients'
+
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
+DB_TABLE = 'Patrons' if ACCOUNT == 'Luchnik_ByBit' else 'Clients'
 
 connects = {
     'BitTeam': BitTeam,
