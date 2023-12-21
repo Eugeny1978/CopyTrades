@@ -12,7 +12,8 @@ div_line = '--------------------------------------------------------------------
 ACCOUNT =  'Constantin_GateIo' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
 
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
-DB_TABLE = 'Patrons' if ACCOUNT == 'Luchnik_ByBit' else 'Clients'
+
+CLIENT_ACCOUNTS = ('Constantin_ByBit', 'Constantin_GateIo', 'Luchnik_Okx') #
 
 connects = {
     'BitTeam': BitTeam,
@@ -23,11 +24,12 @@ connects = {
     'Okx': ccxt.okx
 }
 
-def get_data_account():
+def get_data_account(account_name):
+    db_table = 'Patrons' if account_name == 'Luchnik_ByBit' else 'Clients'
     with sq.connect(DATABASE) as connect:
         connect.row_factory = sq.Row  # строки записей в виде dict {}. По умолчанию - кортежи turple ()
         curs = connect.cursor()
-        curs.execute(f"SELECT exchange, apiKey, secret, password FROM '{DB_TABLE}' WHERE name LIKE '{ACCOUNT}'")
+        curs.execute(f"SELECT exchange, apiKey, secret, password FROM '{db_table}' WHERE name LIKE '{account_name}'")
         responce = curs.fetchone()
         result = {
             'exchange': responce['exchange'],
@@ -45,9 +47,17 @@ def get_balance(exchange):
     df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
     return df_compact
 
+
+def cancel_all_account_orders(account_name):
+    data_account = get_data_account(account_name)
+    exchange = connects[data_account['exchange']](data_account['keys'])
+    for symbol in SYMBOLS:
+        exchange.cancel_all_orders(symbol)
+    print(account_name, get_balance(exchange), div_line, sep='\n')
+
 def main():
-    account = get_data_account()
-    exchange = connects[account['exchange']](account['keys'])
+    # account = get_data_account(account_name=ACCOUNT)
+    # exchange = connects[account['exchange']](account['keys'])
 
     # # 'Luchnik_ByBit'
     # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=2.2, price=10.7)
@@ -74,7 +84,9 @@ def main():
     # exchange.create_market_order(symbol='ETH/USDT', side='buy', amount=0.019225, price=2200)
     # exchange.create_market_order(symbol='BTC/USDT', side='buy', amount=0.000981, price=43500)
 
+    # print(get_balance(exchange))
 
-    print(get_balance(exchange))
+    for account in CLIENT_ACCOUNTS:
+        cancel_all_account_orders(account)
 
 main()

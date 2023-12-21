@@ -21,6 +21,11 @@ class Exchanges:
     4. Получить Лимитные Ордера Аккаунта (Таблицу Агрегированную по Price + (Buy Sell))
     5. Сравнить Агрегированные Ордера Патрона с Клиентом
     Сравнить Таблицу Ордера
+
+    Округление Ордеров до 4 знаков. 0.0001. При Цене BTC = 40000 это 4 доллара. Остальные меньше.
+    Причина:
+    Биржа Gate_io - Правила выставления для BTC ETH - довольно крупными кусками - и поэтому получится
+    при более точном округлении - на каждом шаге будет корректировать эту незначительную разницу
     """
 
     def __init__(self):
@@ -74,9 +79,12 @@ class Exchanges:
     def get_account_orders(self, exchange):
         orders = []
         for symbol in SYMBOLS:
-            order_list = exchange.fetch_open_orders(symbol)
-            for order in order_list:
-                orders.append(order)
+            try:
+                order_list = exchange.fetch_open_orders(symbol)
+                for order in order_list:
+                    orders.append(order)
+            except:
+                print(f'API Биржи: Не удалось Получить список Ордеров. | Биржа: {exchange}.')
         return self.convert_orders_to_df(orders)
         # Получается глубокий список (список в с писке)
         # order_list = [self.patron_exchange.fetch_open_orders(symbol) for symbol in SYMBOLS]
@@ -84,7 +92,6 @@ class Exchanges:
         # return orders
 
     def convert_orders_to_df(self, orders):
-        # ('symbol', 'type', 'side', 'price', 'amount')
         df = pd.DataFrame(columns=ORDER_COLUMNS)
         for order in orders:
             # для BitTeam - другие Столбцы
@@ -100,14 +107,14 @@ class Exchanges:
         for client_name, client_exchange in self.client_exchanges.items():
             template_orders = patron_orders.copy()
             client_rate = self.data_base.clients.query(f'name == "{client_name}"')['rate'].values[0]
-            template_orders['amount'] = template_orders['amount'] * client_rate
+            template_orders['amount'] = np.round(template_orders['amount'] * client_rate, decimals=4)
             client_orders = self.get_account_orders(client_exchange)
             if len(client_orders):
                 client_orders['amount'] = -client_orders['amount']
                 table_for_copy = pd.concat([template_orders, client_orders])
                 agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
-                round_amounts = np.round(agg_table_for_copy['amount'], decimals=5)
-                agg_table_for_copy['amount'] = round_amounts
+                # round_amounts = np.round(agg_table_for_copy['amount'], decimals=6)
+                # agg_table_for_copy['amount'] = round_amounts
                 agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
                 ordertables_for_copy_clients[client_name] = agg_table_for_copy
             else:
@@ -115,7 +122,6 @@ class Exchanges:
         return ordertables_for_copy_clients
 
     def copy_orders(self, ordertables_for_copy_clients):
-        # account_db_index = 0
         for client_name, table in ordertables_for_copy_clients.items():
             client_exchange = self.client_exchanges[client_name]
             print(div_line, f'Копирование Аккаунта: {client_name} | Биржа: {client_exchange}', sep='\n')
@@ -125,32 +131,33 @@ class Exchanges:
                 continue # пустая таблица - ничего корректировать не надо
             print(f'Таблица для Корректировки Ордеров: | Mount - разница между необходимым Объемом и Текущим', table, sep='\n')
             for index, order in table.iterrows():
-                # client_exchange = self.client_exchanges[exchange_name]
                 # Предварительно сниму все ордера по этому символу с этой ценой и side
                 # Вариант Добавления Части - повышенный риск "мелких" Ордеров - объемом менее минимально допустимого на бирже
                 self.cancel_orders_with_price(client_exchange, order['symbol'], order['side'], order['price'])
                 # Выставлю одним ордером Полный объем, ориентируясь на таблицу ордеров патрона.
-                order_amount = self.get_amount_price_patron_orders(order['symbol'], order['side'], order['price'], client_name) # прописать полный объем по данной цене
+                order_amount = self.get_amount_price_patron_orders(order['symbol'], order['side'], order['price'], client_name)
                 if order_amount:  # если есть объем по данной цене и side у Патрона
+                    print(f"+++ Будет СОЗДАН Ордер {order['symbol']} {order['side'].upper()} для Цены: {order['price']} Объемом: {order_amount}:")
                     try:
-                        print(f"+++ Будет СОЗДАН Ордер {order['symbol']} {order['side'].upper()} для Цены: {order['price']} Объемом: {order_amount}:")
                         client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
                     except:
                         print('!!! ОШИБКА при Попытке Создать Ордер. | Скорее всего НЕ Хватает средств на счету')
             print(div_line)
-            # account_db_index += 1
             sleep(ACCOUNT_PAUSE)
 
     def get_orders_with_price(self, client_exchange, symbol, side, price):
         """
         Только Лимитные Ордера
         """
-        all_orders = client_exchange.fetch_open_orders(symbol)
         price_orders = []
-        for order in all_orders:
-            if order['side'] == side and order['price'] == price and order['type'] == 'limit':
-                temp_order = {'id': order['id'], 'side': order['side'], 'price': order['price']}
-                price_orders.append(temp_order)
+        try:
+            all_orders = client_exchange.fetch_open_orders(symbol)
+            for order in all_orders:
+                if order['side'] == side and order['price'] == price and order['type'] == 'limit':
+                    temp_order = {'id': order['id'], 'side': order['side'], 'price': order['price'], 'amount': order['amount']}
+                    price_orders.append(temp_order)
+        except:
+            print(f'API Биржи: Не удалось получить Список Текущих Ордеров. | Биржа: {client_exchange}')
         return price_orders
 
     def cancel_orders_with_price(self, client_exchange, symbol, side, price):
@@ -158,7 +165,10 @@ class Exchanges:
         if len(price_orders):
             print(f'--- Будут ОТМЕНЕНЫ Ордера {symbol} "{side.upper()}" для Цены: {price}:', *price_orders, sep='\n')
         for order in price_orders:
-            client_exchange.cancel_order(order['id'], symbol)
+            try:
+                client_exchange.cancel_order(order['id'], symbol)
+            except:
+                print(f'API Биржи: Не удалось Удалить Ордер по его ID. | Биржа: {client_exchange}')
 
     def get_amount_price_patron_orders(self, symbol, side, price, client_name):
         patron = self.patron_orders
@@ -166,7 +176,7 @@ class Exchanges:
         filter = f"symbol == '{symbol}' and type == 'limit' and side == '{side}' and price == {price}"
         row_order = patron.query(filter)
         if len(row_order):
-            amount = round(patron.query(filter)['amount'].values[0] * client_rate, 5) # Округляю Объем
+            amount = round(patron.query(filter)['amount'].values[0] * client_rate, 4) # Округляю Объем
         else:
             amount = 0
         return amount
