@@ -2,7 +2,7 @@ import sqlite3 as sq
 from data_base.path_to_base import DATABASE
 
 # Run Stop
-BOT = 'Stop'
+BOT = 'Run'
 
 def set_bot_status():
     with sq.connect(DATABASE) as connect:

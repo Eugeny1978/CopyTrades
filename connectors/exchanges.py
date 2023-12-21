@@ -105,18 +105,22 @@ class Exchanges:
     def get_ordertables_for_copy_clients(self, patron_orders):
         ordertables_for_copy_clients = {}
         for client_name, client_exchange in self.client_exchanges.items():
+
             template_orders = patron_orders.copy()
-            client_rate = self.data_base.clients.query(f'name == "{client_name}"')['rate'].values[0]
-            template_orders['amount'] = np.round(template_orders['amount'] * client_rate, decimals=4)
+            if len(patron_orders):
+                client_rate = self.data_base.clients.query(f'name == "{client_name}"')['rate'].values[0]
+                template_orders['amount'] = np.round(template_orders['amount'] * client_rate, decimals=4)
+
             client_orders = self.get_account_orders(client_exchange)
             if len(client_orders):
                 client_orders['amount'] = -client_orders['amount']
-                table_for_copy = pd.concat([template_orders, client_orders])
-                agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
-                # round_amounts = np.round(agg_table_for_copy['amount'], decimals=6)
-                # agg_table_for_copy['amount'] = round_amounts
-                agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
-                ordertables_for_copy_clients[client_name] = agg_table_for_copy
+                if len(patron_orders):
+                    table_for_copy = pd.concat([template_orders, client_orders])
+                    agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+                    agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
+                    ordertables_for_copy_clients[client_name] = agg_table_for_copy
+                else:
+                    ordertables_for_copy_clients[client_name] = client_orders
             else:
                 ordertables_for_copy_clients[client_name] = template_orders
         return ordertables_for_copy_clients
@@ -141,7 +145,7 @@ class Exchanges:
                     try:
                         client_exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], price=order['price'], amount=order_amount)
                     except:
-                        print('!!! ОШИБКА при Попытке Создать Ордер. | Скорее всего НЕ Хватает средств на счету')
+                        print('!!! ОШИБКА при Попытке Создать Ордер. | Скорее всего НЕ Хватает средств на счету | Либо Биржа НЕ дает выставить Данный Объем.')
             print(div_line)
             sleep(ACCOUNT_PAUSE)
 

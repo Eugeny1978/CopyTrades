@@ -9,7 +9,7 @@ pd.options.display.max_columns= 20 # Макс Кол-во Отображаемы
 div_line = '-----------------------------------------------------------------------------------------------------'
 
 # Работаю с Аккаунтом
-ACCOUNT =  'Constantin_GateIo' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
+ACCOUNT =  'Luchnik_Okx' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_GateIo' 'Luchnik_Okx'
 
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 
@@ -56,8 +56,13 @@ def cancel_all_account_orders(account_name):
     print(account_name, get_balance(exchange), div_line, sep='\n')
 
 def main():
-    # account = get_data_account(account_name=ACCOUNT)
-    # exchange = connects[account['exchange']](account['keys'])
+
+    # # Удаление всех Ордеров на Клиентах. Ордера на патроне Остаются
+    # for account in CLIENT_ACCOUNTS:
+    #     cancel_all_account_orders(account)
+
+    account = get_data_account(ACCOUNT)
+    exchange = connects[account['exchange']](account['keys'])
 
     # # 'Luchnik_ByBit'
     # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=2.2, price=10.7)
@@ -83,10 +88,14 @@ def main():
     # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=3.80785, price=10.7)
     # exchange.create_market_order(symbol='ETH/USDT', side='buy', amount=0.019225, price=2200)
     # exchange.create_market_order(symbol='BTC/USDT', side='buy', amount=0.000981, price=43500)
+    # -----
+    # exchange.create_order('ATOM/USDT', type='limit', side='buy', amount=1, price=9.0)
+    # exchange.create_order('ATOM/USDT', type='limit', side='sell', amount=1, price=13.0)
+    # # exchange.create_order('ATOM/USDT', type='limit', side='sell', amount=0.968, price=13.0) # Мин Объем по ATOM = 1
+    # exchange.cancel_all_orders('ATOM/USDT') # Для Okx метод не РАБОТАЕТ - вывыливается с ошибкой
 
-    # print(get_balance(exchange))
+    print(get_balance(exchange))
 
-    for account in CLIENT_ACCOUNTS:
-        cancel_all_account_orders(account)
+
 
 main()

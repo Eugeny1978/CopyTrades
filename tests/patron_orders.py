@@ -7,7 +7,7 @@ ACCOUNT = 'Luchnik_ByBit'
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 
 config = {
-    'create': True,
+    'create': False,
     'cancel': True,
 }
 
