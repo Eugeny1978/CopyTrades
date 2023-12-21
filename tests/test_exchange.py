@@ -28,7 +28,7 @@ for client_name, table in ordertables_for_copy_clients.items():
 
 
 # Копирование Ордеров
-# exchanges.copy_orders(ordertables_for_copy_clients)
+exchanges.copy_orders(ordertables_for_copy_clients)
 
 
 

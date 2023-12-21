@@ -9,7 +9,7 @@ pd.options.display.max_columns= 20 # Макс Кол-во Отображаемы
 div_line = '-----------------------------------------------------------------------------------------------------'
 
 # Работаю с Аккаунтом
-ACCOUNT =  'Constantin_Gate' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
+ACCOUNT =  'Constantin_GateIo' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_Gate' 'Luchnik_Okx'
 
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 DB_TABLE = 'Patrons' if ACCOUNT == 'Luchnik_ByBit' else 'Clients'
@@ -63,12 +63,11 @@ def main():
     # exchange.create_market_buy_order(symbol='ATOM/USDT', amount=3.96) # не отрабатывает просит почему-то цену
     # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=3.96, price=10.72)
 
-    # # 'Constantin_Gate'
+    # # 'Constantin_GateIo'
     # exchange.create_market_sell_order(symbol='XRP/USDT', amount=23.53579)
     # exchange.create_market_order(symbol='ETH/USDT', side='buy', amount=0.015861, price=2200)
     # exchange.create_market_order(symbol='BTC/USDT', side='buy', amount=0.00081, price=43500)
-    # # Осталось Разобраться почему не в Белом Списке АТОМ
-    exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=3.14148, price=10.7) #
+    # exchange.create_market_sell_order(symbol='ATOM/USDT', amount=3.125)
 
     # # 'Luchnik_Okx'
     # exchange.create_market_order(symbol='ATOM/USDT', side='buy', amount=3.80785, price=10.7)

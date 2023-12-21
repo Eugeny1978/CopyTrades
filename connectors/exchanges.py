@@ -53,14 +53,21 @@ class Exchanges:
                 'secret': self.data_base.patron['secret'][0],
                 'password': self.data_base.patron['password'][0],
                 }
-        return self.__connect_exchange(name_exchange, keys)
+        try:
+            exchange = self.__connect_exchange(name_exchange, keys)
+        except:
+            raise LogicErrors('API Биржи: Не удается подключиться к Бирже Акк. Патрона. | Проверьте АпиКлючи')
+        return exchange
 
     def __connect_clients(self):
         client_connects = {}
         for index, client in self.data_base.clients.iterrows():
             name_exchange = client['exchange']
             keys = {'apiKey': client['apiKey'], 'secret': client['secret'], 'password': client['password']}
-            client_connects[client['name']] = self.__connect_exchange(name_exchange, keys)
+            try:
+                client_connects[client['name']] = self.__connect_exchange(name_exchange, keys)
+            except:
+                print(f"API Биржи: Не удается подключиться к Бирже Клиента. | Проверьте АпиКлючи | Акк.: {client['name']}. Биржа: {name_exchange}.")
             sleep(PAUSE)
         return client_connects
 
@@ -90,38 +97,40 @@ class Exchanges:
 
     def get_ordertables_for_copy_clients(self, patron_orders):
         ordertables_for_copy_clients = {}
-        index = 0
         for client_name, client_exchange in self.client_exchanges.items():
             template_orders = patron_orders.copy()
-            template_orders['amount'] = template_orders['amount'] * self.data_base.clients['rate'][index]
+            client_rate = self.data_base.clients.query(f'name == "{client_name}"')['rate'].values[0]
+            template_orders['amount'] = template_orders['amount'] * client_rate
             client_orders = self.get_account_orders(client_exchange)
-            client_orders['amount'] = -client_orders['amount']
-            table_for_copy = pd.concat([template_orders, client_orders])
-            agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
-            round_amounts = np.round(agg_table_for_copy['amount'], decimals=6)
-            agg_table_for_copy['amount'] = round_amounts
-            agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
-            ordertables_for_copy_clients[client_name] = agg_table_for_copy
-            index += 1
+            if len(client_orders):
+                client_orders['amount'] = -client_orders['amount']
+                table_for_copy = pd.concat([template_orders, client_orders])
+                agg_table_for_copy = table_for_copy.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+                round_amounts = np.round(agg_table_for_copy['amount'], decimals=5)
+                agg_table_for_copy['amount'] = round_amounts
+                agg_table_for_copy = agg_table_for_copy[agg_table_for_copy['amount'] != 0]
+                ordertables_for_copy_clients[client_name] = agg_table_for_copy
+            else:
+                ordertables_for_copy_clients[client_name] = template_orders
         return ordertables_for_copy_clients
 
     def copy_orders(self, ordertables_for_copy_clients):
-        account_db_index = 0
-        for exchange_name, table in ordertables_for_copy_clients.items():
-            client_name = self.data_base.clients['name'][account_db_index]
-            print(div_line, f'Копирование Аккаунта: {client_name} | Биржа: {exchange_name}', sep='\n')
+        # account_db_index = 0
+        for client_name, table in ordertables_for_copy_clients.items():
+            client_exchange = self.client_exchanges[client_name]
+            print(div_line, f'Копирование Аккаунта: {client_name} | Биржа: {client_exchange}', sep='\n')
             if not len(table):
                 print('Ордера НЕ нуждаются в Корректировке', div_line, sep='\n')
-                account_db_index += 1
+                # account_db_index += 1
                 continue # пустая таблица - ничего корректировать не надо
             print(f'Таблица для Корректировки Ордеров: | Mount - разница между необходимым Объемом и Текущим', table, sep='\n')
             for index, order in table.iterrows():
-                client_exchange = self.client_exchanges[exchange_name]
+                # client_exchange = self.client_exchanges[exchange_name]
                 # Предварительно сниму все ордера по этому символу с этой ценой и side
                 # Вариант Добавления Части - повышенный риск "мелких" Ордеров - объемом менее минимально допустимого на бирже
                 self.cancel_orders_with_price(client_exchange, order['symbol'], order['side'], order['price'])
                 # Выставлю одним ордером Полный объем, ориентируясь на таблицу ордеров патрона.
-                order_amount = self.get_amount_price_patron_orders(order['symbol'], order['side'], order['price'], account_db_index) # прописать полный объем по данной цене
+                order_amount = self.get_amount_price_patron_orders(order['symbol'], order['side'], order['price'], client_name) # прописать полный объем по данной цене
                 if order_amount:  # если есть объем по данной цене и side у Патрона
                     try:
                         print(f"+++ Будет СОЗДАН Ордер {order['symbol']} {order['side'].upper()} для Цены: {order['price']} Объемом: {order_amount}:")
@@ -129,7 +138,7 @@ class Exchanges:
                     except:
                         print('!!! ОШИБКА при Попытке Создать Ордер. | Скорее всего НЕ Хватает средств на счету')
             print(div_line)
-            account_db_index += 1
+            # account_db_index += 1
             sleep(ACCOUNT_PAUSE)
 
     def get_orders_with_price(self, client_exchange, symbol, side, price):
@@ -151,13 +160,13 @@ class Exchanges:
         for order in price_orders:
             client_exchange.cancel_order(order['id'], symbol)
 
-    def get_amount_price_patron_orders(self, symbol, side, price, account_db_index):
+    def get_amount_price_patron_orders(self, symbol, side, price, client_name):
         patron = self.patron_orders
-        account_rate = self.data_base.clients['rate'][account_db_index]
+        client_rate = self.data_base.clients.query(f'name == "{client_name}"')['rate'].values[0]
         filter = f"symbol == '{symbol}' and type == 'limit' and side == '{side}' and price == {price}"
         row_order = patron.query(filter)
         if len(row_order):
-            amount = round(patron.query(filter).reset_index()['amount'][0] * account_rate, 6) # Округляю Объем
+            amount = round(patron.query(filter)['amount'].values[0] * client_rate, 5) # Округляю Объем
         else:
             amount = 0
         return amount
