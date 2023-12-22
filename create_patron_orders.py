@@ -2,11 +2,12 @@ import json
 import ccxt
 import sqlite3 as sq
 import pandas as pd
-from connectors.bitteam import BitTeam
 from random import uniform
 from time import sleep, localtime, strftime, time
 
+from connectors.bitteam import BitTeam
 from data_base.path_to_base import DATABASE
+
 pd.options.display.width= None # Отображение Таблицы на весь Экран
 pd.options.display.max_columns= 20 # Макс Кол-во Отображаемых Колонок
 div_line = '-----------------------------------------------------------------------------------------------------'
@@ -17,7 +18,7 @@ SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 SPREDS = (2, 3 ,5)
 VOLUME = 10
 ORDER_PAUSE = 1
-PAUSE = 1*60
+PAUSE = 15*60
 
 def print_d(*args):
     print(*args, div_line, sep='\n')
