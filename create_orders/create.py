@@ -29,7 +29,7 @@ def get_data_account(account_name):
     with sq.connect(DATABASE) as connect:
         connect.row_factory = sq.Row  # строки записей в виде dict {}. По умолчанию - кортежи turple ()
         curs = connect.cursor()
-        curs.execute(f"SELECT exchange, apiKey, secret, password FROM '{db_table}' WHERE name LIKE '{account_name}'")
+        curs.execute(f"SELECT exchange, apiKey, secret, password FROM {db_table} WHERE name LIKE '{account_name}'")
         responce = curs.fetchone()
         result = {
             'exchange': responce['exchange'],

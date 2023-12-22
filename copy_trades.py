@@ -20,7 +20,7 @@ div_line = '--------------------------------------------------------------------
 def get_bot_status():
     with sq.connect(DATABASE) as connect:
         curs = connect.cursor()
-        curs.execute(f"SELECT status FROM BotStatus")
+        curs.execute(f"SELECT status FROM BotStatuses WHERE bot LIKE 'Copy_bot'")
         return curs.fetchone()[0]
 
 def get_local_time():
