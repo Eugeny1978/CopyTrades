@@ -2,8 +2,8 @@ import sqlite3 as sq
 from data_base.path_to_base import DATABASE
 
 # Run Stop
-COPY_BOT = 'Run'
-PATRON_BOT = 'Stop'
+COPY_BOT = 'Stop'
+PATRON_BOT = 'Run'
 
 def set_bot_statuses():
     with sq.connect(DATABASE) as connect:

@@ -196,6 +196,8 @@ def main():
     if get_bot_status() == 'Run':
         patron = PatronBot(ACCOUNT, SYMBOLS, SPREDS, VOLUME)
         print_d(f'Аккаунт: {ACCOUNT} | {get_local_time()}', f'Биржа: {patron.exchange}')
+    else:
+        print("Процесс не был запущен. Измените статус 'Patron_bot' на значение 'Run'")
 
     while get_bot_status() == 'Run':
         start_time = time()
@@ -234,7 +236,7 @@ def main():
         sleep(PAUSE)
         print_d(f'Пауза Завершена. | {get_local_time()}', div_line)
 
-    match patron, get_bot_status():
+    match isinstance(patron, PatronBot), get_bot_status():
         case True, 'Stop':
             patron.cancel_all_account_orders()
             print(f'Ордера ОТМЕНЕНЫ. | {get_local_time()}')
@@ -243,6 +245,6 @@ def main():
         case True, _:
             print(f'БОТ ОСТАНОВЛЕН. | {get_local_time()}')
         case _:
-            print("Процесс не был запущен. Измените статус 'Patron_bot' на значение 'Run'")
+            pass
 
 main()

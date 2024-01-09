@@ -55,7 +55,7 @@ def main():
 
         # Пауза между проверками
         sleep(PAUSE)
-        print(f'Пауза {PAUSE} сек. | {get_local_time()}')
+        print(f'Пауза между сверкой {PAUSE} сек. | {get_local_time()}')
 
     print(f'Процесс Копирования Лимитных Ордеров ОСТАНОВЛЕН. | {get_local_time()}')
 

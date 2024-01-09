@@ -34,7 +34,7 @@ class BitTeam(): # Request
 
     def __request(self, path:str, method:str='get', params={}, data={}):
         """
-        # Возможно необходимо прописать Заголовок headers = {'user-agent': 'my-app/0.0.1'}
+        # Если понадобится прописать Заголовок headers = {'user-agent': 'my-app/0.0.1'} добавлю
         :path: Локальный Путь к Конечной Точке
         :method: 'get', 'post'
         :params: payloads = {} Параметры (дополняют url ? &)
