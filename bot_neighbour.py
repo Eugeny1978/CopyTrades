@@ -10,6 +10,51 @@ import ccxt
 from data_base.path_to_base import DATABASE             # Путь к Базе Данных
 from connectors.logic_errors import LogicErrors         # Ошибки
 
+ACCOUNT = 'Luchnik_ByBit'
+SYMBOL = 'ATOM/USDT'
+QUANT = 0.95 # граница для определения минимального Размера для Больших Плит
+DELTA = 0.15 # минимальное расстояние (в %) между соседними Плитами
+
+pd.options.display.width= None # Отображение Таблицы на весь Экран
+pd.options.display.max_columns= 20 # Макс Кол-во Отображаемых Колонок
+pd.options.display.max_rows= 200 # Макс Кол-во Отображаемых Колонок
+# pd.options.display.float_format = '{:.6f}'.format # Формат отображения Чисел float
+div_line =      '-------------------------------------------------------------------------------------'
+double_line =   '====================================================================================='
+
+def print_json(data):
+    print(json.dumps(data))
+
+def print_volume_values(table_name, table, accuracy=6):
+    print(f'{table_name}. VOLUMES.',
+          f'Median: {round(table["volume"].median(), accuracy)}',
+          f'Golden Section: {round(table["volume"].quantile(0.618), accuracy)}',
+          f'0.75 Quantile: {round(table["volume"].quantile(0.75), accuracy)}',
+          f'Mean: {round(table["volume"].mean(), accuracy)}',
+          f'SUM: {round(table["volume"].sum(), accuracy)}',
+          div_line, sep='\n')
+
+def get_order_prices(prices, price_step, type='sell'):
+    order_prices = []
+    for index, price in prices.items():
+        if not len(order_prices):
+            order_prices.append(price)
+            continue
+        if len(order_prices) == 3:
+            break
+        if type == 'sell' and price >= order_prices[-1] * (1 + DELTA/100):
+            order_prices.append(price)
+        if type == 'buy' and price <= order_prices[-1] * (1 - DELTA/100):
+            order_prices.append(price)
+    if type == 'sell':
+        order_prices = [round(price - 10**-price_step, price_step) for price in order_prices]
+    elif type == 'buy':
+        order_prices = [round(price + 10**-price_step, price_step) for price in order_prices]
+    return order_prices
+
+
+
+
 
 # 0.
 # Соединение с Биржей
@@ -88,12 +133,48 @@ class Bot:
         max_decimal = max(decimals)
         return max_decimal
 
+    def get_asks_bids_tables(self):
+        orderbook = self.exchange.fetch_order_book(self.symbol, limit=200)
+        columns = ('price', 'volume')
+        asks = pd.DataFrame(orderbook['asks'], columns=columns)
+        bids = pd.DataFrame(orderbook['bids'], columns=columns)
+        # asks_volumes = asks['volume']# asks.iloc[:, 1]
+        print_volume_values('ASKS', asks, self.volume_step)
+        print_volume_values('BIDS', bids, self.volume_step)
+
+        return {'asks': asks, 'bids' : bids}
+
+
 
 def main():
-    ACCOUNT = 'Luchnik_ByBit'
-    SYMBOL = 'ATOM/USDT'
+
+    # Инициализация
     bot = Bot(ACCOUNT, SYMBOL)
-    print(bot.__dict__)
+
+    # Получение Таблиц Asks Bids
+    orderbook = bot.get_asks_bids_tables()
+    asks = orderbook['asks']
+    bids = orderbook['bids']
+
+
+    # Получение Значиния для Больших Плит
+    ask_slab = round(asks['volume'].quantile(QUANT), bot.volume_step)
+    bid_slab = round(bids['volume'].quantile(QUANT), bot.volume_step)
+    print(ask_slab, bid_slab)
+
+    # Получение Таблиц только с крупными Объемами
+    big_asks = asks.query(f'volume >= {ask_slab}')
+    big_bids = bids.query(f'volume >= {bid_slab}')
+    print(big_asks, div_line, sep='\n')
+    print(big_bids, div_line, sep='\n')
+
+    # Получение Цен для Лимитных Ордеров:
+    sell_order_prices = get_order_prices(big_asks['price'], bot.price_step, type='sell')
+    buy_order_prices = get_order_prices(big_bids['price'], bot.price_step, type='buy')
+    print(sell_order_prices)
+    print(buy_order_prices)
+
+
 
 
 
