@@ -145,7 +145,6 @@ class Bot:
         return {'asks': asks, 'bids' : bids}
 
 
-
 def main():
 
     # Инициализация
@@ -156,8 +155,7 @@ def main():
     asks = orderbook['asks']
     bids = orderbook['bids']
 
-
-    # Получение Значиния для Больших Плит
+    # Получение Значений для Больших Плит
     ask_slab = round(asks['volume'].quantile(QUANT), bot.volume_step)
     bid_slab = round(bids['volume'].quantile(QUANT), bot.volume_step)
     print(ask_slab, bid_slab)
