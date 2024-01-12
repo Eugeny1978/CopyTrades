@@ -1,4 +1,4 @@
-from connectors.exchanges import Exchanges
+from connectors.exchanges_old import Exchanges
 import ccxt
 import json
 import pandas as pd

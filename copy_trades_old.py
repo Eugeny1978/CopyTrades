@@ -1,4 +1,4 @@
-from connectors.exchanges import Exchanges, SYMBOLS
+from connectors.exchanges_old import Exchanges, SYMBOLS
 import pandas as pd
 import sqlite3 as sq
 from time import sleep, time, localtime, strftime    # Создание технологических Пауз

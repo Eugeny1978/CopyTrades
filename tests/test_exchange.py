@@ -1,4 +1,4 @@
-from connectors.exchanges import Exchanges
+from connectors.exchanges_old import Exchanges
 import pandas as pd
 
 pd.options.display.width= None # Отображение Таблицы на весь Экран
