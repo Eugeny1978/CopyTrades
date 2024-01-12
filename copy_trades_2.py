@@ -91,7 +91,6 @@ class Exchanges:
 
     def __get_symbol_decimals(self):
         for client_exchange in self.client_exchanges.values():
-
             pass
 
 

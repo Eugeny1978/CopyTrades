@@ -139,9 +139,8 @@ class Bot:
         asks = pd.DataFrame(orderbook['asks'], columns=columns)
         bids = pd.DataFrame(orderbook['bids'], columns=columns)
         # asks_volumes = asks['volume']# asks.iloc[:, 1]
-        print_volume_values('ASKS', asks, self.volume_step)
-        print_volume_values('BIDS', bids, self.volume_step)
-
+        # print_volume_values('ASKS', asks, self.volume_step)
+        # print_volume_values('BIDS', bids, self.volume_step)
         return {'asks': asks, 'bids' : bids}
 
 
@@ -150,7 +149,7 @@ def main():
     # Инициализация
     bot = Bot(ACCOUNT, SYMBOL)
 
-    # Получение Таблиц Asks Bids
+    # Получение Таблиц Asks, Bids
     orderbook = bot.get_asks_bids_tables()
     asks = orderbook['asks']
     bids = orderbook['bids']
