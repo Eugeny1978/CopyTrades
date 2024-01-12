@@ -1,0 +1,16 @@
+{'data_base': <connectors.data_base.DataBaseRequests object at 0x000001A4F32C8750>,
+'patron_exchange': ccxt.bybit(),
+'client_exchanges': {'Luchnik_Okx': ccxt.okx(), 'Constantin_GateIo': ccxt.gateio(), 'Luchnik_ByBit': ccxt.bybit()},
+'client_exchange_names': {'ByBit', 'Okx', 'Gate_io'},
+'symbols': ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT'),
+'symbol_steps':
+exchange_name     symbol  price_step  volume_step
+0       Gate.io  ATOM/USDT           3            7
+1       Gate.io   ETH/USDT           2            8
+2       Gate.io   BTC/USDT           1            9
+3           OKX  ATOM/USDT           3            6
+4           OKX   ETH/USDT           2            6
+5           OKX   BTC/USDT           1            8
+6         Bybit  ATOM/USDT           4            3
+7         Bybit   ETH/USDT           2            5
+8         Bybit   BTC/USDT           2            6}
