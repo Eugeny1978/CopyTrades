@@ -8,8 +8,8 @@ from connectors.logic_errors import LogicErrors     # Обработка Лог�
 PAUSE = 1           # Пауза между Запросами
 ACCOUNT_PAUSE = 3   # Пауза между Обработкой Клиентов
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')  # Сравнение по Торгуемым Парам
-div_line =    '-------------------------------------------------------------------------------------'
-double_line = '====================================================================================='
+div_line =    '--------------------------------------------------------------------------------------------------------'
+double_line = '========================================================================================================'
 
 class Exchanges:
     """
@@ -35,7 +35,6 @@ class Exchanges:
         self.data_base = DataBaseRequests()
         self.patron_exchange = self.__connect_patron()
         self.client_exchanges = self.__connect_clients()
-        # self.client_exchange_names = self.__get_exchange_names()
         self.symbols = symbols
         self.symbol_steps = self.__get_symbol_steps_table()
         self.templates = {}
@@ -81,10 +80,6 @@ class Exchanges:
             sleep(PAUSE)
         return client_connects
 
-    def __get_exchange_names(self):
-        names = [name for name in self.data_base.clients['exchange']]
-        return set(names)
-
     def __get_symbol_steps_table(self):
         df = pd.DataFrame(columns=('exchange_name', 'symbol', 'price_step', 'volume_step'))
         exchanges = set(self.client_exchanges.values())
@@ -95,11 +90,9 @@ class Exchanges:
         return df
 
     def __get_symbol_steps(self, exchange, symbol):
-        ticker = exchange.fetch_ticker(symbol)
-        prices = [ticker['high'], ticker['low'], ticker['open'], ticker['close'], ticker['bid'], ticker['ask']]
-        volumes = [ticker['bidVolume'], ticker['askVolume'], ticker['baseVolume']]
-        price_step = self.__get_decimal(prices)
-        volume_step = self.__get_decimal(volumes)
+        bids = exchange.fetch_order_book(symbol, limit=10)['bids']
+        price_step = self.__get_decimal([bid[0] for bid in bids])
+        volume_step = self.__get_decimal([bid[1] for bid in bids])
         return {'price_step': price_step, 'volume_step': volume_step}
 
     def __get_decimal(self, args: list):
@@ -194,24 +187,25 @@ class Exchanges:
                             print(message, message_1, id)
                         except Exception as error:
                             print(error)
-
-                if order['amount'] < 0:
-                    message_2 = ' | Ордер создавать НЕ Нужно!. Amount < 0'
+                # Создать Лимитный ордер с данными параметрами (см message). Amount взять из таблицы-образца
+                amount = self.get_template_amount(client, order)
+                if not amount:
+                    message_2 = ' | Ордер создавать НЕ Нужно!'
                     print(message, message_2)
                 else:
-                    # Создать Лимитный ордер с данными параметрами (см message). Amount взять из таблицы-образца
-                    amount = self.get_template_amount(client, order)
                     try:
                         new_order = exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], amount=amount, price=order['price'])
                         message_3 = f" | Создан Ордер Объемом = {amount} | ID: {new_order['id']}"
                         print(message, message_3)
                     except Exception as error:
-                        print(error)
-
+                        print(message, f'Объем = {amount}', error)
 
     def get_template_amount(self, client, order):
         symbol, price, side = order['symbol'], order['price'], order['side']
-        amount = self.templates[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['amount'].values[0]
+        try:
+            amount = self.templates[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['amount'].values[0]
+        except:
+            amount = None
         return amount
 
     def get_id_orders(self, client, order):
@@ -245,4 +239,10 @@ class Exchanges:
         print(message, agg_delta_orders, sep='\n')
         return agg_delta_orders
 
-
+    def get_balance(self, exchange):
+        balance = exchange.fetch_balance()
+        indexes = ['free', 'used', 'total']
+        columns = [balance['free'], balance['used'], balance['total']]
+        df = pd.DataFrame(columns, index=indexes)
+        df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
+        return df_compact

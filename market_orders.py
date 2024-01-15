@@ -26,4 +26,11 @@ if __name__ == "__main__":
             # exchange.create_market_order(symbol='BTC/USDT', side='buy', amount=0.00078, price=42500)
             # exchange.create_market_order(symbol='ETH/USDT', side='buy', amount=0.0134, price=2500)
 
+        if client == 'Luchnik_Okx':
+            pass
+            # print('продаю для Luchnik_Okx')
+            # exchange.create_market_order(symbol='ATOM/USDT', side='sell', amount=4)
+            # exchange.create_market_order(symbol='BTC/USDT', side='sell', amount=0.0005)
+            # exchange.create_market_order(symbol='ETH/USDT', side='sell', amount=0.0025)
+
 
