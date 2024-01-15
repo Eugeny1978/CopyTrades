@@ -30,8 +30,7 @@ def main():
     # Копирование Ордеров
     exchanges.copy_orders(patron_orders)
 
-    # print(json.dumps(exchanges.orders))
-    for account_name, orders in exchanges.orders.items():
-        print(div_line, account_name, orders, sep='\n')
+    # for account_name, orders in exchanges.orders.items():
+    #     print(div_line, account_name, orders, sep='\n')
 
 main()

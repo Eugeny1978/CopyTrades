@@ -38,6 +38,7 @@ class Exchanges:
         # self.client_exchange_names = self.__get_exchange_names()
         self.symbols = symbols
         self.symbol_steps = self.__get_symbol_steps_table()
+        self.templates = {}
         self.orders = {}
 
     connects = {
@@ -125,10 +126,9 @@ class Exchanges:
         return self.__convert_orders_to_df(orders)
 
     def get_order_table(self, orders):
-        df = pd.DataFrame(columns=('id', 'clientOrderId', 'symbol', 'type', 'side', 'price', 'amount'))
+        df = pd.DataFrame(columns=('id', 'symbol', 'type', 'side', 'price', 'amount'))
         for order in orders:
             df.loc[len(df)] = (order['id'],
-                               order['clientOrderId'],
                                order['symbol'],
                                order['type'],
                                order['side'],
@@ -139,7 +139,7 @@ class Exchanges:
     def __convert_orders_to_df(self, orders):
         df = pd.DataFrame(columns=('symbol', 'type', 'side', 'price', 'amount'))
         for order in orders:
-            df.loc[len(df)] = [order['symbol'], order['type'], order['side'], order['price'], order['remaining']]
+            df.loc[len(df)] = (order['symbol'], order['type'], order['side'], order['price'], order['remaining'])
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
     def get_patron_ordertable(self):
@@ -183,10 +183,31 @@ class Exchanges:
             print('Ордера НЕ нуждаются в Корректировке')
         else:
             for index, order in delta_orders.iterrows():
-                order_info = 111 #get_id_symbol_
-                if order['amount'] < 0:
-                    pass
 
+                message = f"{order['symbol']} | {order['side']} | {order['price']}"
+                message_1 = ' | Будут удалены Ордера с ID:'
+                ids = self.get_id_orders(client, order)
+                if ids:
+                    print(message, message_1, ids)
+                    # Удалить ордера по id symbol
+                    # for id in ids:
+                    #     exchange.cancel_order(id=id, symbol=order['symbol'])
+                if order['amount'] < 0:
+                    message_2 = ' | Ордер создавать НЕ Нужно!. Amount < 0'
+                else:
+                    message_2 = ' | Будет Создан Ордер'
+                    # Создать Лимитный ордер с данными параметрами (см message) + amount взять из таблицы образца
+                print(message, message_2)
+
+    def get_template_amount(self, client, symbol, side, price):
+        amount = self.templates[client].query(f'symbol == "{symbol}" and side == "{side}" and price == price')['amount'].values[0]
+        return amount
+
+
+    def get_id_orders(self, client, order):
+        symbol, price, side = order['symbol'], order['price'], order['side']
+        ids = tuple(self.orders[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['id'])
+        return ids
 
     def get_template_orders(self, client, exchange, patron_orders):
         client_rate = self.data_base.clients.query(f'name == "{client}"')['rate'].values[0]
@@ -199,6 +220,7 @@ class Exchanges:
             template.loc[template['symbol'] == symbol, 'price'] = round(template['price'], price_step)
             template.loc[template['symbol'] == symbol, 'amount'] = round(template['amount'], volume_step)
         print(f'Таблица Образец:', template, div_line, sep='\n')
+        self.templates[client] = template
         return template
 
     def compare_orders(self, client_orders, template_orders):
