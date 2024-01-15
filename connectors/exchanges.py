@@ -183,27 +183,36 @@ class Exchanges:
             print('Ордера НЕ нуждаются в Корректировке')
         else:
             for index, order in delta_orders.iterrows():
-                # params = [client, order['symbol'], order['side'], order['price']]
-
                 message = f"{order['symbol']} | {order['side']} | {order['price']}"
-                message_1 = ' | Будут удалены Ордера с ID:'
+                message_1 = ' | Удален Ордер с ID:'
                 ids = self.get_id_orders(client, order)
                 if ids:
-                    print(message, message_1, ids)
-                    # Удалить ордера по id symbol
-                    # for id in ids:
-                    #     exchange.cancel_order(id=id, symbol=order['symbol'])
+                    # Удалить ордера по id
+                    for id in ids:
+                        try:
+                            exchange.cancel_order(id=id, symbol=order['symbol'])
+                            print(message, message_1, id)
+                        except Exception as error:
+                            print(error)
+
                 if order['amount'] < 0:
                     message_2 = ' | Ордер создавать НЕ Нужно!. Amount < 0'
+                    print(message, message_2)
                 else:
-                    message_2 = ' | Будет Создан Ордер'
-                    # Создать Лимитный ордер с данными параметрами (см message) + amount взять из таблицы образца
-                print(message, message_2)
+                    # Создать Лимитный ордер с данными параметрами (см message). Amount взять из таблицы-образца
+                    amount = self.get_template_amount(client, order)
+                    try:
+                        new_order = exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], amount=amount, price=order['price'])
+                        message_3 = f" | Создан Ордер Объемом = {amount} | ID: {new_order['id']}"
+                        print(message, message_3)
+                    except Exception as error:
+                        print(error)
 
-    def get_template_amount(self, client, symbol, side, price):
-        amount = self.templates[client].query(f'symbol == "{symbol}" and side == "{side}" and price == price')['amount'].values[0]
+
+    def get_template_amount(self, client, order):
+        symbol, price, side = order['symbol'], order['price'], order['side']
+        amount = self.templates[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['amount'].values[0]
         return amount
-
 
     def get_id_orders(self, client, order):
         symbol, price, side = order['symbol'], order['price'], order['side']
@@ -228,8 +237,8 @@ class Exchanges:
         if len(client_orders):
             client_orders['amount'] = -client_orders['amount']
             delta_orders = pd.concat([client_orders, template_orders])
-            agg_delta_orders = delta_orders.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
-            agg_delta_orders = agg_delta_orders[agg_delta_orders['amount'] != 0]
+            agg_delta_orders = delta_orders.groupby(['symbol', 'type', 'side', 'price']).sum()
+            agg_delta_orders = agg_delta_orders[agg_delta_orders['amount'] != 0].reset_index()
         else:
             agg_delta_orders = template_orders
         message = 'Табл. Сравнения. Amount - разница между необходимым Объемом и Текущим. | (-) лишний объем, (+) не хватает'
