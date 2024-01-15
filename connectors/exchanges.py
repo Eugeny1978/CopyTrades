@@ -38,6 +38,7 @@ class Exchanges:
         # self.client_exchange_names = self.__get_exchange_names()
         self.symbols = symbols
         self.symbol_steps = self.__get_symbol_steps_table()
+        self.orders = {}
 
     connects = {
         'ByBit': ccxt.bybit,
@@ -111,16 +112,29 @@ class Exchanges:
         max_decimal = max(decimals)
         return max_decimal
 
-    def get_account_orders(self, exchange):
+    def get_account_orders(self, account_name, exchange):
         orders = []
         for symbol in self.symbols:
             try:
                 order_list = exchange.fetch_open_orders(symbol)
                 for order in order_list:
                     orders.append(order)
+                    self.orders[account_name] = self.get_order_table(orders)
             except:
                 print(f'API Биржи: Не удалось Получить список Ордеров. | Биржа: {exchange}.')
         return self.__convert_orders_to_df(orders)
+
+    def get_order_table(self, orders):
+        df = pd.DataFrame(columns=('id', 'clientOrderId', 'symbol', 'type', 'side', 'price', 'amount'))
+        for order in orders:
+            df.loc[len(df)] = (order['id'],
+                               order['clientOrderId'],
+                               order['symbol'],
+                               order['type'],
+                               order['side'],
+                               order['price'],
+                               order['remaining'])
+        return df
 
     def __convert_orders_to_df(self, orders):
         df = pd.DataFrame(columns=('symbol', 'type', 'side', 'price', 'amount'))
@@ -129,27 +143,50 @@ class Exchanges:
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
     def get_patron_ordertable(self):
-        return self.get_account_orders(self.patron_exchange)
+        return self.get_account_orders(self.data_base.patron['name'][0], self.patron_exchange)
+
+    def cancel_account_orders(self, account_name, exchange, symbols):
+        match exchange.name:
+            case 'OKX':
+                order_ids = []
+                for symbol in symbols:
+                    order_list = exchange.fetch_open_orders(symbol)
+                    for order in order_list:
+                        order_ids.append({'id': order['id'], 'symbol': symbol})
+                print(f'{account_name} | Будут Удалены Все Ордера:')
+                for order in order_ids:
+                    exchange.cancel_order(order['id'], order['symbol'])
+                    print(order['symbol'], order['id'])
+                print(div_line)
+            case _:
+                for symbol in symbols:
+                    exchange.cancel_all_orders(symbol)
+                print(f'{account_name} | Удалены Все Ордера', div_line, sep='\n')
 
 
     def copy_orders(self, patron_orders):
         match len(patron_orders):
             case 0:
                 for client, exchange in self.client_exchanges.items():
-                    if exchange.name != 'OKX': # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        for symbol in self.symbols:
-                            exchange.cancel_all_orders(symbol)
-                        print(f'{client} | Удалены Все Ордера', div_line, sep='\n')
+                    self.cancel_account_orders(client, exchange, self.symbols)
             case _:
                 for client, exchange in self.client_exchanges.items():
                     self.copy_client_orders(client, exchange, patron_orders)
 
 
     def copy_client_orders(self, client, exchange, patron_orders):
-        client_orders = self.get_account_orders(exchange)
+        client_orders = self.get_account_orders(client, exchange)
         print(double_line, f'Таблица Ордеров Акк. {client}', client_orders, div_line, sep='\n')
         template_orders = self.get_template_orders(client, exchange, patron_orders)
         delta_orders = self.compare_orders(client_orders, template_orders)
+        if not len(delta_orders):
+            print('Ордера НЕ нуждаются в Корректировке')
+        else:
+            for index, order in delta_orders.iterrows():
+                order_info = 111 #get_id_symbol_
+                if order['amount'] < 0:
+                    pass
+
 
     def get_template_orders(self, client, exchange, patron_orders):
         client_rate = self.data_base.clients.query(f'name == "{client}"')['rate'].values[0]
@@ -172,7 +209,8 @@ class Exchanges:
             agg_delta_orders = agg_delta_orders[agg_delta_orders['amount'] != 0]
         else:
             agg_delta_orders = template_orders
-        print('Таблица Сравнения:', agg_delta_orders, sep='\n')
+        message = 'Табл. Сравнения. Amount - разница между необходимым Объемом и Текущим. | (-) лишний объем, (+) не хватает'
+        print(message, agg_delta_orders, sep='\n')
         return agg_delta_orders
 
 

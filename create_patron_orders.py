@@ -15,10 +15,10 @@ div_line = '--------------------------------------------------------------------
 # Работаю с Аккаунтом
 ACCOUNT =  'Luchnik_ByBit' # 'Luchnik_ByBit' 'Constantin_ByBit' 'Constantin_GateIo' 'Luchnik_Okx'
 SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
-SPREDS = (2, 3 ,5)
+SPREDS = (3, 4 ,5)
 VOLUME = 10
 ORDER_PAUSE = 1
-PAUSE = 15*60
+PAUSE = 60*60
 
 def print_d(*args):
     print(*args, div_line, sep='\n')
@@ -173,7 +173,6 @@ class PatronBot:
         columns = ('id', 'symbol', 'type', 'side', 'price', 'amount')
         df = pd.DataFrame(columns=columns)
         for order in orders:
-            # для BitTeam - другие Столбцы
             df.loc[len(df)] = [order['id'], order['symbol'], order['type'], order['side'], order['price'], order['amount']]
             #df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
         return df
