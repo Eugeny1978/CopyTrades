@@ -183,6 +183,7 @@ class Exchanges:
             print('Ордера НЕ нуждаются в Корректировке')
         else:
             for index, order in delta_orders.iterrows():
+                # params = [client, order['symbol'], order['side'], order['price']]
 
                 message = f"{order['symbol']} | {order['side']} | {order['price']}"
                 message_1 = ' | Будут удалены Ордера с ID:'
