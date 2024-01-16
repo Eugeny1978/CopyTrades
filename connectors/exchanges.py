@@ -210,7 +210,10 @@ class Exchanges:
 
     def get_id_orders(self, client, order):
         symbol, price, side = order['symbol'], order['price'], order['side']
-        ids = tuple(self.orders[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['id'])
+        try:
+            ids = tuple(self.orders[client].query(f'symbol == "{symbol}" and price == {price} and side == "{side}"')['id'])
+        except:
+            ids = None
         return ids
 
     def get_template_orders(self, client, exchange, patron_orders):
