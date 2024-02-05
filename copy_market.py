@@ -92,25 +92,6 @@ class Trader:
         except:
             return 0
 
-    # def get_info_text(self, symbol, amount):
-    #     return f"{self.client['name']} | {self.client['exchange']} | {symbol}, Объем: {amount} | "
-    #
-    # def sell_market(self, symbol, amount):
-    #     text = self.get_info_text(symbol, amount)
-    #     try:
-    #         self.connection.create_market_sell_order(symbol=symbol, amount=amount)
-    #         print(text, 'ПРОДАНО по РЫНКУ')
-    #     except:
-    #         print(text, 'НЕ Удалось Продать по Рынку')
-    #
-    # def buy_market(self, symbol, amount):
-    #     text = self.get_info_text(symbol, amount)
-    #     try:
-    #         self.connection.create_market_buy_order(symbol=symbol, amount=amount)
-    #         print(text, 'КУПЛЕНО по РЫНКУ')
-    #     except:
-    #         print(text, 'НЕ Удалось Купить по Рынку')
-
     def market_order(self, symbol: str, amount: float, side: str):
         order_side = {'sell': self.connection.create_market_sell_order,
                       'buy': self.connection.create_market_buy_order}
@@ -223,32 +204,40 @@ if __name__ == '__main__':
     # print(json.dumps(sell_trade)) # проверил сделка проходит. Дает инфу только sell_trade['id']. Остальные Поля = Null
 
     new_deals = patron.get_new_trades()
-    print(*new_deals, sep='\n')
 
-    # Клиенты
-    clients = ClientData(trade='Liquid_coins').clients
+    if not new_deals:
+        print(datetime.now(), 'Новых Необработанных Сделок НЕТ')
+    else:
+        print(datetime.now(), *new_deals, div_line, sep='\n')
+        # Клиенты
+        clients = ClientData(trade='Liquid_coins').clients
 
-    # Обход Клиентов
-    for client in clients:
+        # Обход Клиентов
+        for client in clients:
 
-        trader = Trader(client) # Подготовка к Торговле
-        if not trader.connection:
-            continue
-        print(trader.client['name'], trader.balance, div_line, sep='\n') ###
+            trader = Trader(client) # Подготовка к Торговле
+            if not trader.connection:
+                continue
+            print(f"{trader.client['name']} | Состояние ПЕРЕД Изменением Баланса", trader.balance, div_line, sep='\n') ###
 
-        # Обход Свежих сделок
-        for deal in new_deals:
-            symbol = deal['symbol']
-            coin = symbol.split('/')[0]
-            price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
-            table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt')) # необх только для распечатки таблицы
-            match deal['side']:
-                case 'sell': # Продажа ПО РЫНКУ
-                    amount_coin = trader.get_amount_coin(coin)
-                    cost_usdt = round(price_usdt * amount_coin, 2)
-                    table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
-                    if cost_usdt > 10.1:
-                        trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
-                case 'buy': # Покупка ПО РЫНКУ
-                    trader.market_order(symbol=symbol, amount=(deal['amount'] * trader.client['rate']), side='buy')
-            print(coin, table, sep='\n')
+            # Обход Свежих сделок
+            for deal in new_deals:
+                symbol = deal['symbol']
+                coin = symbol.split('/')[0]
+                price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
+                table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt')) # необх только для распечатки таблицы
+                match deal['side']:
+                    case 'sell': # Продажа ПО РЫНКУ
+                        amount_coin = trader.get_amount_coin(coin)
+                        cost_usdt = round(price_usdt * amount_coin, 2)
+                        table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
+                        if cost_usdt > 10.1:
+                            trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
+                        else:
+                            print(f"{client['name']}, {client['exchange']} | Недостаточно средств для Продажи!")
+                    case 'buy': # Покупка ПО РЫНКУ
+                        amount_coin = deal['amount'] * trader.client['rate']
+                        amount_coin_r = trader.connection.amount_to_precision(symbol, amount_coin)
+                        trader.market_order(symbol=symbol, amount=amount_coin_r, side='buy')
+            print(div_line)
+            # print(coin, table, sep='\n')
