@@ -1,16 +1,20 @@
 import json
 import pandas as pd             # Работа с DataFrame
 import sqlite3 as sq            # Работа с Базой Данных
-from data_base.path_to_base import DATABASE # Путь к Базе Данных
+from data_base.path_to_base import DATABASE, TEST_DB # Путь к Базе Данных
 import ccxt
 from datetime import datetime, timedelta, date # Работа с Временем
+import pytz
 from time import mktime
 
+div_line = '-' * 120
 SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT')
 SYMBOLS_shit = ('DEL/USDT')
 PATRON_liquid = 'Constantin_ByBit'
 PATRON_shit = 'Constantin_Mexc'
-DELTA_MIN = 60 # Интервал вглуь которого проверяется наличие новых Сделок
+DATABASE = TEST_DB
+TRADE_TYPE = 'Liquid_coins'
+DELTA_MIN = 3* 60 # Интервал, вглубь которого проверяется наличие новых Сделок
 
 connections = {
     'Binance': ccxt.binance,
@@ -88,19 +92,36 @@ class Trader:
         except:
             return 0
 
-    def sell_market(self, symbol, amount):
-        try:
-            trade = self.connection.create_market_sell_order(symbol=symbol, amount=amount)
-            print(f"{self.client['name']} | {self.client['exchange']} | ПРОДАНО по Рынку: {symbol}, Объем: {trade['amount']}, Цена: {trade['price']}")
-        except:
-            print(f"{self.client['name']} | {self.client['exchange']} | НЕ Удалось Продать по Рынку: {symbol}, Объем: {amount}")
+    # def get_info_text(self, symbol, amount):
+    #     return f"{self.client['name']} | {self.client['exchange']} | {symbol}, Объем: {amount} | "
+    #
+    # def sell_market(self, symbol, amount):
+    #     text = self.get_info_text(symbol, amount)
+    #     try:
+    #         self.connection.create_market_sell_order(symbol=symbol, amount=amount)
+    #         print(text, 'ПРОДАНО по РЫНКУ')
+    #     except:
+    #         print(text, 'НЕ Удалось Продать по Рынку')
+    #
+    # def buy_market(self, symbol, amount):
+    #     text = self.get_info_text(symbol, amount)
+    #     try:
+    #         self.connection.create_market_buy_order(symbol=symbol, amount=amount)
+    #         print(text, 'КУПЛЕНО по РЫНКУ')
+    #     except:
+    #         print(text, 'НЕ Удалось Купить по Рынку')
 
-    def buy_market(self, symbol, amount, price):
+    def market_order(self, symbol: str, amount: float, side: str):
+        order_side = {'sell': self.connection.create_market_sell_order,
+                      'buy': self.connection.create_market_buy_order}
+        info = {'sell': "ПРОДАЖА '---' ",
+                'buy': "ПОКУПКА '+++' "}
+        text = f"{self.client['name']} | {self.client['exchange']} | {symbol}, Объем: {amount} | "
         try:
-            trade = self.connection.create_market_order(symbol=symbol, amount=amount, side='buy', price=price)
-            print(f"{self.client['name']} | {self.client['exchange']} | КУПЛЕНО по Рынку: {symbol}, Объем: {trade['amount']}, Цена: {trade['price']}")
+            order_side[side](symbol=symbol, amount=amount)
+            print(text, f"{info[side]} ПО РЫНКУ")
         except:
-            print(f"{self.client['name']} | {self.client['exchange']} | НЕ Удалось Купить по Рынку: {symbol}, Объем: {amount}")
+            print(text, f"НЕ Удалась {info[side]} по рынку!")
 
 
 class PatronData:
@@ -144,13 +165,14 @@ class PatronData:
             not_trade = False if responce else True
             return not_trade
 
-    def record_id_trade(self, symbol:str, id:str):
+    def record_id_trade(self, trade: dict):
         with sq.connect(DATABASE) as connect:
             curs = connect.cursor()
-            curs.execute(f"""INSERT INTO MarketTrades (symbol, id) VALUES ('{symbol}', '{id}')""")
+            curs.execute(f"""INSERT INTO MarketTrades (symbol, id, side, amount, cost, price, datetime) VALUES 
+            ('{trade['symbol']}', '{trade['id']}', '{trade['side']}', {trade['amount']}, {trade['cost']}, {trade['price']}, '{trade['datetime']}')""")
 
     def get_new_trades(self):
-        start_dt = str(datetime.now() - timedelta(minutes=DELTA_MIN))
+        start_dt = str(datetime.now(tz=pytz.UTC) - timedelta(minutes=DELTA_MIN))
         # start_stamp = mktime(start_dt.timetuple()) # Нужно * 1000 чб получить время по которому сравниваем. не стоку а дату
         start_stamp = self.connection.parse8601(start_dt) # встроенный метод
         new_trades = []
@@ -161,24 +183,45 @@ class PatronData:
                     for trade in last_trades:
                         if trade['type'] == 'market':
                             if self.not_id_trade_db(trade['id']):
-                                new_trades.append({'symbol': symbol,
-                                                  'id': trade['id'],
-                                                  'side': trade['side'],
-                                                  'amount': trade['amount'],
-                                                  'cost': trade['cost']})
-                                self.record_id_trade(symbol, trade['id'])
-                    if len(new_trades):
-                        print(f"За последние {DELTA_MIN} мин. БЫЛИ Сделки ПО РЫНКУ:")
+                                trade_info = {'symbol': symbol,
+                                              'id': trade['id'],
+                                              'side': trade['side'],
+                                              'amount': trade['amount'],
+                                              'cost': round(trade['cost'], 1),
+                                              'price': trade['price'],
+                                              'datetime': trade['datetime']}
+                                new_trades.append(trade_info)
+                                self.record_id_trade(trade_info)
             except:
                 print(f"По каким-то причинам Запрос не был Обработан Биржей")
+        if len(new_trades):
+            print(f"За последние {DELTA_MIN} мин. Есть НОВЫЕ (необработанные) Сделки ПО РЫНКУ:")
         return new_trades
+
+    def get_price_amount_for_trade(self, symbol, cost_usdt):
+        price = self.connection.fetch_ticker(symbol)['last']
+        amount = float(self.connection.amount_to_precision(symbol, (cost_usdt / price)))
+        return (price, amount)
 
 
 
 if __name__ == '__main__':
 
     # БЛОК: КАКИЕ COINs НЕОБХОДИМО продать ПО РЫНКУ. Смотрю свежие Сделки ПО РЫНКУ Патрона
-    patron = PatronData('Liquid_coins')
+    patron = PatronData(TRADE_TYPE)
+
+    # # БЛОК Предварительно Куплю и Продам для Тестов
+    # symbol_s, cost_usdt_s = 'ATOM/USDT', 10
+    # symbol_b, cost_usdt_b = 'ETH/USDT', 10
+    # price_s, amount_s = patron.get_price_amount_for_trade(symbol_s, cost_usdt_s)
+    # price_b, amount_b = patron.get_price_amount_for_trade(symbol_b, cost_usdt_b)
+    # print(f"{symbol_s = } | {price_s = } | {amount_s = }")  ###
+    # print(f"{symbol_b = } | {price_b = } | {amount_b = }")  ###
+    # sell_trade = patron.connection.create_market_sell_order(symbol=symbol_s, amount=amount_s)
+    # buy_trade = patron.connection.create_market_buy_order(symbol=symbol_b, amount=amount_b)
+    # print(json.dumps(buy_trade)) # проверил сделка проходит. Дает инфу только buy_trade['id']. Остальные Поля = Null
+    # print(json.dumps(sell_trade)) # проверил сделка проходит. Дает инфу только sell_trade['id']. Остальные Поля = Null
+
     new_deals = patron.get_new_trades()
     print(*new_deals, sep='\n')
 
@@ -191,6 +234,7 @@ if __name__ == '__main__':
         trader = Trader(client) # Подготовка к Торговле
         if not trader.connection:
             continue
+        print(trader.client['name'], trader.balance, div_line, sep='\n') ###
 
         # Обход Свежих сделок
         for deal in new_deals:
@@ -204,36 +248,7 @@ if __name__ == '__main__':
                     cost_usdt = round(price_usdt * amount_coin, 2)
                     table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
                     if cost_usdt > 10.1:
-                        trader.sell_market(symbol=symbol, amount=amount_coin)
+                        trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
                 case 'buy': # Покупка ПО РЫНКУ
-                    trader.buy_market(symbol=symbol, amount=(deal['amount'] * trader.client['rate']), price=price_usdt)
+                    trader.market_order(symbol=symbol, amount=(deal['amount'] * trader.client['rate']), side='buy')
             print(coin, table, sep='\n')
-
-
-
-
-
-
-
-
-# ЧЕРНОВИК
-    ## БЛОК Копирование Сделок По РЫНКУ. НЕобходимо в предыдущем Блоке сформировать coin (возможно список coins)
-    # coin = 'LINK'
-    # symbol = f"{coin}/USDT"
-    # price_usdt = 0
-    # clients = ClientData(trade='Liquid_coins').clients
-    # table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt'))
-    #
-    # for client in clients:
-    #     trader = Trader(client)
-    #     if not trader.connection:
-    #         continue
-    #     if not price_usdt:
-    #         price_usdt = trader.connection.fetch_ticker(symbol)['last']
-    #     amount_coin = trader.get_amount_coin(coin)
-    #     cost_usdt = round(price_usdt * amount_coin, 2)
-    #     table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
-    #     if cost_usdt > 10.5:
-    #         trader.sell_market(symbol=symbol, amount=amount_coin)
-    #
-    # print(coin, table, sep='\n')
