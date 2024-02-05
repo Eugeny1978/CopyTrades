@@ -137,10 +137,9 @@ class PatronData:
             return curs.fetchone()
 
     def not_id_trade_db(self, id):
-        query = (f"""SELECT * FROM MarketTrades WHERE id IS '{id}'""")
         with sq.connect(DATABASE) as connect:
             curs = connect.cursor()
-            curs.execute(query)
+            curs.execute(f"""SELECT * FROM MarketTrades WHERE id IS '{id}'""")
             responce = curs.fetchone()
             not_trade = False if responce else True
             return not_trade
@@ -178,7 +177,7 @@ class PatronData:
 
 if __name__ == '__main__':
 
-    ## БЛОК Формирования КАКОЙ COIN НЕОБХОДИМО продать по рынку
+    # БЛОК: КАКИЕ COINs НЕОБХОДИМО продать ПО РЫНКУ. Смотрю свежие Сделки ПО РЫНКУ Патрона
     patron = PatronData('Liquid_coins')
     new_deals = patron.get_new_trades()
     print(*new_deals, sep='\n')
@@ -189,11 +188,11 @@ if __name__ == '__main__':
     # Обход Клиентов
     for client in clients:
 
-        trader = Trader(client) # Подготовка к торговле
+        trader = Trader(client) # Подготовка к Торговле
         if not trader.connection:
             continue
 
-        # Обход всех новых сделок
+        # Обход Свежих сделок
         for deal in new_deals:
             symbol = deal['symbol']
             coin = symbol.split('/')[0]
