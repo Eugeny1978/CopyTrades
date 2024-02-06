@@ -1,4 +1,6 @@
 /.idea/
 /venv/
 /data_base/DataBase.db
+/data_base/DataBase_Test.db
+/data_base/DB from server/
 создание exe.txt
