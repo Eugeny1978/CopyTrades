@@ -1,11 +1,11 @@
 import json                     # Вывод в виде JSON объектов (для анализа результатов запросов при отладке)
 import pandas as pd             # Работа с DataFrame
 import sqlite3 as sq            # Работа с Базой Данных
-from data_base.path_to_base import DATABASE, TEST_DB # Путь к Базам Данных
-import ccxt                     # Запросы к Биржам
-from datetime import datetime, timedelta, date # Работа с Временем
-import pytz
-from time import mktime
+from data_base.path_to_base import DATABASE, TEST_DB # Путь к Базам Данных (Рабочая, Тестовая)
+import ccxt                     # REST Запросы к Биржам
+from datetime import datetime, timedelta # Работа с Датой и Временем
+from time import sleep, time    # Работа с Временем (Паузы, Интервалы)
+
 
 pd.options.display.width= None # Отображение Таблицы на весь Экран
 pd.options.display.max_columns= 20 # Макс Кол-во Отображаемых Колонок
@@ -17,9 +17,14 @@ SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT')
 SYMBOLS_shit = ('DEL/USDT')
 PATRON_liquid = 'Constantin_ByBit'
 PATRON_shit = 'Constantin_Mexc'
+
 DATABASE = TEST_DB
 TRADE_TYPE = 'Liquid_coins'
-DELTA_MIN = 1 * 24 * 60 # Интервал, вглубь которого проверяется наличие новых Сделок
+BOT_NAME = 'Copy_liquid_market'
+INTERVAL = 60 # интервал между просмотром свежих сделок у Патрона
+PAUSE = 1 # пуаза между обработкой
+DELTA_MIN = 60 # Интервал, вглубь которого проверяется наличие новых Сделок:
+
 
 connections = {
     'Binance': ccxt.binance,
@@ -29,6 +34,12 @@ connections = {
     'Mexc': ccxt.mexc,
     'Okx': ccxt.okx
 }
+
+def get_bot_status():
+    with sq.connect(DATABASE) as connect:
+        curs = connect.cursor()
+        curs.execute(f"SELECT status FROM BotStatuses WHERE bot LIKE '{BOT_NAME}'")
+        return curs.fetchone()[0]
 
 def connect_exchange(account):
     try:
@@ -41,7 +52,7 @@ def connect_exchange(account):
         connection.password = account['password']
         return connection
     except:
-        print(f"НЕ Удалось подключиться. Проверьте API Ключи | {account['name']} | {account['exchange']}")
+        print(f"{account['name']} | {account['exchange']} | НЕ Удалось подключиться. Проверьте API Ключи.")
         return None
 
 def form_datetime(dt: str):
@@ -49,7 +60,13 @@ def form_datetime(dt: str):
     dt = ' '.join(dt.split('T'))
     return dt
 
+def get_dt_now():
+    dt_now = datetime.now()
+    dt_str = dt_now.strftime(FORMAT_dt)
+    return dt_str
+
 class ClientData:
+
     def __init__(self, trade: str): # 'Liquid_coins', 'Shit_coins'
         self.trade = trade
         self.exchanges, self.db_table = self.get_exchanges()
@@ -105,20 +122,14 @@ class Trader:
         # Патрон должен покупать мин на 11 USDT чб в случ падения цены сохр условие мин Лота
         order_side = {'sell': self.connection.create_market_sell_order,
                       'buy': self.connection.create_market_buy_order}
-        info = {'sell': "SELL",
-                'buy': "BUY"}
-        text = f"{self.client['name']} | {self.client['exchange']} | {symbol}, Объем: {amount} | "
+        text = f"{symbol}, {side.upper()}, Объем: {amount} | "
         try:
             order_side[side](symbol=symbol, amount=amount)
-            print(text, f"{info[side]} ПО РЫНКУ")
+            print(text, "УСПЕШНО создан по РЫНКУ")
         except:
-            print(text, f"НЕ Удалась {info[side]} по рынку!")
-
-
+            print(text, f"НЕ Удалась создать по рынку! XXX")
 
 class PatronData:
-    name = 'Constantin_ByBit'
-    db_table = 'Patrons'
 
     def __init__(self, trade: str): # 'Liquid_coins', 'Shit_coins'
         self.name, self.symbols, self.db_table = self.get_constantes(trade)
@@ -160,11 +171,18 @@ class PatronData:
     def record_id_trade(self, trade: dict):
         with sq.connect(DATABASE) as connect:
             curs = connect.cursor()
-            curs.execute(f"""INSERT INTO MarketTrades (symbol, id, side, amount, cost, price, datetime, timestamp) VALUES 
-            ('{trade['symbol']}', '{trade['id']}', '{trade['side']}', {trade['amount']}, {trade['cost']}, {trade['price']}, '{trade['datetime']}', {trade['timestamp']})""")
+            curs.execute(f"""INSERT INTO MarketTrades (symbol, id, side, amount, cost, price, datetime, timestamp) 
+            VALUES (
+            '{trade['symbol']}', 
+            '{trade['id']}', 
+            '{trade['side']}', 
+            {trade['amount']}, 
+            {trade['cost']}, 
+            {trade['price']}, 
+            '{trade['datetime']}', 
+            {trade['timestamp']})""")
 
     def get_new_trades(self):
-
         # start_dt = str(datetime.now(tz=pytz.UTC) - timedelta(minutes=DELTA_MIN))
         start_dt = str(datetime.utcnow() - timedelta(minutes=DELTA_MIN))
         # start_stamp = mktime(start_dt.timetuple()) # Нужно * 1000 чб получить время по которому сравниваем. не стоку а дату
@@ -175,7 +193,7 @@ class PatronData:
                 last_trades = self.connection.fetch_my_trades(symbol=symbol, since=start_stamp)
             except Exception as error:
                 print(error)
-                print(f"По Запрос не был Обработан Биржей. Проверьте Синхронизацию Времени")
+                print(f"Запрос не был Обработан Биржей. Проверьте Синхронизацию Времени")
                 continue
             if len(last_trades):
                 for trade in last_trades:
@@ -191,8 +209,6 @@ class PatronData:
                                           'timestamp': trade['timestamp']}
                             new_trades.append(trade_info)
                             self.record_id_trade(trade_info)
-        if len(new_trades):
-            print(f"За последние {DELTA_MIN} мин. Есть НОВЫЕ (необработанные) Сделки ПО РЫНКУ:")
         return new_trades
 
     def get_price_amount_for_trade(self, symbol, cost_usdt):
@@ -201,11 +217,16 @@ class PatronData:
         return (price, amount)
 
 
-
 if __name__ == '__main__':
 
-    # БЛОК: КАКИЕ COINs НЕОБХОДИМО продать ПО РЫНКУ. Смотрю свежие Сделки ПО РЫНКУ Патрона
-    patron = PatronData(TRADE_TYPE)
+    was_run = False
+    if get_bot_status() == 'Run':
+        print(get_dt_now(), 'Процесс Копирования Сделок ПО РЫНКУ ЗАПУЩЕН.', sep=' | ')
+        # БЛОК: КАКИЕ COINs НЕОБХОДИМО продать ПО РЫНКУ. Смотрю свежие Сделки ПО РЫНКУ Патрона
+        patron = PatronData(TRADE_TYPE)
+        was_run = True
+    else:
+        print("Процесс НЕ был запущен. Измените статус Бота на значение 'Run'")
 
     # # БЛОК Предварительно Куплю и Продам для Тестов
     # symbol_s, cost_usdt_s = 'ATOM/USDT', 10
@@ -219,42 +240,53 @@ if __name__ == '__main__':
     # print(json.dumps(buy_trade)) # проверил сделка проходит. Дает инфу только buy_trade['id']. Остальные Поля = Null
     # print(json.dumps(sell_trade)) # проверил сделка проходит. Дает инфу только sell_trade['id']. Остальные Поля = Null
 
-    new_deals = patron.get_new_trades()
+    while get_bot_status() == 'Run':
 
-    dt_now = datetime.now().strftime(FORMAT_dt)
-    if not new_deals:
-        print(dt_now, f'За последние {DELTA_MIN} мин. Новых Необработанных Сделок НЕТ', sep=' | ')
-    else:
-        print(dt_now, *new_deals, div_line, sep='\n')
-        # Клиенты
-        clients = ClientData(trade='Liquid_coins').clients
+        new_deals = patron.get_new_trades()
 
-        # Обход Клиентов
-        for client in clients:
+        if not new_deals:
+            print(get_dt_now(), f"За последние {DELTA_MIN} мин. Новых Необработанных Сделок НЕТ", f"Пауза {INTERVAL} сек.", sep=' | ')
+            sleep(INTERVAL)
+            continue
+        else:
+            start_dt = time()
+            print(get_dt_now(), f"За последние {DELTA_MIN} мин. Есть НОВЫЕ (необработанные) Сделки ПО РЫНКУ:", sep=' | ')
+            print(*new_deals, div_line, sep='\n')
 
-            trader = Trader(client) # Подготовка к Торговле
-            if not trader.connection:
-                continue
-            print(f"{trader.client['name']} | Состояние ПЕРЕД Изменением Баланса", trader.balance, div_line, sep='\n') ###
+            # Клиенты
+            clients = ClientData(TRADE_TYPE).clients
 
-            # Обход Свежих сделок
-            for deal in new_deals:
-                symbol = deal['symbol']
-                coin = symbol.split('/')[0]
-                price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
-                table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt')) # необх только для распечатки таблицы
-                match deal['side']:
-                    case 'sell': # Продажа ПО РЫНКУ
-                        amount_coin = trader.get_amount_coin(coin)
-                        cost_usdt = round(price_usdt * amount_coin, 2)
-                        table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
-                        if cost_usdt > 10.1:
-                            trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
-                        else:
-                            print(f"{client['name']}, {client['exchange']} | Недостаточно средств для Продажи!")
-                    case 'buy': # Покупка ПО РЫНКУ
-                        amount_coin = deal['amount'] * trader.client['rate']
-                        amount_coin_r = trader.connection.amount_to_precision(symbol, amount_coin)
-                        trader.market_order(symbol=symbol, amount=amount_coin_r, side='buy')
-            print(div_line)
-            # print(coin, table, sep='\n')
+            # Обход Клиентов
+            for client in clients:
+                print(f"{client['name']} | {client['exchange']} | {get_dt_now()}", div_line, sep='\n')
+
+                trader = Trader(client) # Подготовка к Торговле
+                if not trader.connection:
+                    continue
+                print(f"Баланс ПЕРЕД Изменением:", trader.balance, div_line, sep='\n')
+
+                # Обход Свежих сделок
+                for deal in new_deals:
+                    symbol = deal['symbol']
+                    coin = symbol.split('/')[0]
+                    price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
+                    match deal['side']:
+                        case 'sell': # Продажа ПО РЫНКУ
+                            amount_coin = trader.get_amount_coin(coin)
+                            cost_usdt = round(price_usdt * amount_coin, 2)
+                            if cost_usdt > 10.1:
+                                trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
+                            else:
+                                print(f"{symbol}, {deal['side'].upper()}, Объем: {amount_coin} | Недостаточно средств!")
+                        case 'buy': # Покупка ПО РЫНКУ
+                            amount_coin = deal['amount'] * trader.client['rate']
+                            amount_coin_r = trader.connection.amount_to_precision(symbol, amount_coin)
+                            trader.market_order(symbol=symbol, amount=amount_coin_r, side='buy')
+                print(div_line)
+                sleep(PAUSE)
+                print(f"Баланс ПОСЛЕ Изменений:", trader.get_balance(), div_line, div_line, sep='\n')
+                sleep(PAUSE)
+            print(f'Клиенты Обработаны за {round(time() - start_dt, 3)} сек.', (' |' * 5))
+
+    if get_bot_status() != 'Run' and was_run:
+        print(get_dt_now(), f"Контроль за Сделками по РЫНКУ Отключен.", sep=' | ')
