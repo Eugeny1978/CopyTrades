@@ -1,20 +1,21 @@
-import json
+import json                     # Вывод в виде JSON объектов (для анализа результатов запросов при отладке)
 import pandas as pd             # Работа с DataFrame
 import sqlite3 as sq            # Работа с Базой Данных
-from data_base.path_to_base import DATABASE, TEST_DB # Путь к Базе Данных
-import ccxt
+from data_base.path_to_base import DATABASE, TEST_DB # Путь к Базам Данных
+import ccxt                     # Запросы к Биржам
 from datetime import datetime, timedelta, date # Работа с Временем
 import pytz
 from time import mktime
 
 div_line = '-' * 120
+FORMAT_dt = '%Y-%m-%d %H:%M:%S'
 SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT')
 SYMBOLS_shit = ('DEL/USDT')
 PATRON_liquid = 'Constantin_ByBit'
 PATRON_shit = 'Constantin_Mexc'
 DATABASE = TEST_DB
 TRADE_TYPE = 'Liquid_coins'
-DELTA_MIN = 3* 60 # Интервал, вглубь которого проверяется наличие новых Сделок
+DELTA_MIN = 24 * 60 # Интервал, вглубь которого проверяется наличие новых Сделок
 
 connections = {
     'Binance': ccxt.binance,
@@ -39,6 +40,10 @@ def connect_exchange(account):
         print(f"НЕ Удалось подключиться. Проверьте API Ключи | {account['name']} | {account['exchange']}")
         return None
 
+def form_datetime(dt: str):
+    dt = ' '.join(dt.split('.')[:-1])
+    dt = ' '.join(dt.split('T'))
+    return dt
 
 class ClientData:
     def __init__(self, trade: str): # 'Liquid_coins', 'Shit_coins'
@@ -149,32 +154,37 @@ class PatronData:
     def record_id_trade(self, trade: dict):
         with sq.connect(DATABASE) as connect:
             curs = connect.cursor()
-            curs.execute(f"""INSERT INTO MarketTrades (symbol, id, side, amount, cost, price, datetime) VALUES 
-            ('{trade['symbol']}', '{trade['id']}', '{trade['side']}', {trade['amount']}, {trade['cost']}, {trade['price']}, '{trade['datetime']}')""")
+            curs.execute(f"""INSERT INTO MarketTrades (symbol, id, side, amount, cost, price, datetime, timestamp) VALUES 
+            ('{trade['symbol']}', '{trade['id']}', '{trade['side']}', {trade['amount']}, {trade['cost']}, {trade['price']}, '{trade['datetime']}', {trade['timestamp']})""")
 
     def get_new_trades(self):
-        start_dt = str(datetime.now(tz=pytz.UTC) - timedelta(minutes=DELTA_MIN))
+
+        # start_dt = str(datetime.now(tz=pytz.UTC) - timedelta(minutes=DELTA_MIN))
+        start_dt = str(datetime.utcnow() - timedelta(minutes=DELTA_MIN))
         # start_stamp = mktime(start_dt.timetuple()) # Нужно * 1000 чб получить время по которому сравниваем. не стоку а дату
         start_stamp = self.connection.parse8601(start_dt) # встроенный метод
         new_trades = []
         for symbol in self.symbols:
             try:
                 last_trades = self.connection.fetch_my_trades(symbol=symbol, since=start_stamp)
-                if len(last_trades):
-                    for trade in last_trades:
-                        if trade['type'] == 'market':
-                            if self.not_id_trade_db(trade['id']):
-                                trade_info = {'symbol': symbol,
-                                              'id': trade['id'],
-                                              'side': trade['side'],
-                                              'amount': trade['amount'],
-                                              'cost': round(trade['cost'], 1),
-                                              'price': trade['price'],
-                                              'datetime': trade['datetime']}
-                                new_trades.append(trade_info)
-                                self.record_id_trade(trade_info)
-            except:
-                print(f"По каким-то причинам Запрос не был Обработан Биржей")
+            except Exception as error:
+                print(error)
+                print(f"По Запрос не был Обработан Биржей. Проверьте Синхронизацию Времени")
+                continue
+            if len(last_trades):
+                for trade in last_trades:
+                    if trade['type'] == 'market':
+                        if self.not_id_trade_db(trade['id']):
+                            trade_info = {'symbol': symbol,
+                                          'id': trade['id'],
+                                          'side': trade['side'],
+                                          'amount': trade['amount'],
+                                          'cost': round(trade['cost'], 1),
+                                          'price': trade['price'],
+                                          'datetime': form_datetime(trade['datetime']),
+                                          'timestamp': trade['timestamp']}
+                            new_trades.append(trade_info)
+                            self.record_id_trade(trade_info)
         if len(new_trades):
             print(f"За последние {DELTA_MIN} мин. Есть НОВЫЕ (необработанные) Сделки ПО РЫНКУ:")
         return new_trades
@@ -205,39 +215,40 @@ if __name__ == '__main__':
 
     new_deals = patron.get_new_trades()
 
+    dt_now = datetime.now().strftime(FORMAT_dt)
     if not new_deals:
-        print(datetime.now(), 'Новых Необработанных Сделок НЕТ')
+        print(dt_now, f'За последние {DELTA_MIN} мин. Новых Необработанных Сделок НЕТ', sep=' | ')
     else:
-        print(datetime.now(), *new_deals, div_line, sep='\n')
-        # Клиенты
-        clients = ClientData(trade='Liquid_coins').clients
-
-        # Обход Клиентов
-        for client in clients:
-
-            trader = Trader(client) # Подготовка к Торговле
-            if not trader.connection:
-                continue
-            print(f"{trader.client['name']} | Состояние ПЕРЕД Изменением Баланса", trader.balance, div_line, sep='\n') ###
-
-            # Обход Свежих сделок
-            for deal in new_deals:
-                symbol = deal['symbol']
-                coin = symbol.split('/')[0]
-                price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
-                table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt')) # необх только для распечатки таблицы
-                match deal['side']:
-                    case 'sell': # Продажа ПО РЫНКУ
-                        amount_coin = trader.get_amount_coin(coin)
-                        cost_usdt = round(price_usdt * amount_coin, 2)
-                        table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
-                        if cost_usdt > 10.1:
-                            trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
-                        else:
-                            print(f"{client['name']}, {client['exchange']} | Недостаточно средств для Продажи!")
-                    case 'buy': # Покупка ПО РЫНКУ
-                        amount_coin = deal['amount'] * trader.client['rate']
-                        amount_coin_r = trader.connection.amount_to_precision(symbol, amount_coin)
-                        trader.market_order(symbol=symbol, amount=amount_coin_r, side='buy')
-            print(div_line)
-            # print(coin, table, sep='\n')
+        print(dt_now, *new_deals, div_line, sep='\n')
+        # # Клиенты
+        # clients = ClientData(trade='Liquid_coins').clients
+        #
+        # # Обход Клиентов
+        # for client in clients:
+        #
+        #     trader = Trader(client) # Подготовка к Торговле
+        #     if not trader.connection:
+        #         continue
+        #     print(f"{trader.client['name']} | Состояние ПЕРЕД Изменением Баланса", trader.balance, div_line, sep='\n') ###
+        #
+        #     # Обход Свежих сделок
+        #     for deal in new_deals:
+        #         symbol = deal['symbol']
+        #         coin = symbol.split('/')[0]
+        #         price_usdt = trader.connection.fetch_ticker(symbol)['last'] # нужно ли каждому узнеавать или один раз
+        #         table = pd.DataFrame(columns=('client', 'exchange', 'rate', 'amount_coin', 'cost_usdt')) # необх только для распечатки таблицы
+        #         match deal['side']:
+        #             case 'sell': # Продажа ПО РЫНКУ
+        #                 amount_coin = trader.get_amount_coin(coin)
+        #                 cost_usdt = round(price_usdt * amount_coin, 2)
+        #                 table.loc[len(table)] = (client['name'], client['exchange'], client['rate'], amount_coin, cost_usdt)
+        #                 if cost_usdt > 10.1:
+        #                     trader.market_order(symbol=symbol, amount=amount_coin, side='sell')
+        #                 else:
+        #                     print(f"{client['name']}, {client['exchange']} | Недостаточно средств для Продажи!")
+        #             case 'buy': # Покупка ПО РЫНКУ
+        #                 amount_coin = deal['amount'] * trader.client['rate']
+        #                 amount_coin_r = trader.connection.amount_to_precision(symbol, amount_coin)
+        #                 trader.market_order(symbol=symbol, amount=amount_coin_r, side='buy')
+        #     print(div_line)
+        #     # print(coin, table, sep='\n')
