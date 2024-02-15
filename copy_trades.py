@@ -13,7 +13,7 @@ pd.options.display.max_rows = 30 # Макс Кол-во Отображаемых
 # ACCOUNT_PAUSE = 3   # Пауза между Обработкой Клиентов
 # ORDER_PAUSE = 1
 PAUSE = 5*60 # Пауза между Полным циклом Проверки и Копирования Ордеров (мин)
-SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')  # Сравнение по Торгуемым Парам
+SYMBOLS = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT', 'XLM/USDT')  # Сравнение по Торгуемым Парам
 div_line =    '--------------------------------------------------------------------------------------------------------'
 double_line = '========================================================================================================'
 
@@ -85,31 +85,6 @@ def main():
             print(f'БОТ НЕ АКТИВЕН. | {get_local_time()}')
         case _:
             pass
-
-
-    # # Инициализация
-    # exchanges = Exchanges(SYMBOLS)
-    # # print(exchanges.__dict__)
-    #
-    # # Получаю Агрегированную Таблицу Ордеров Патрона
-    # patron_orders = exchanges.get_patron_ordertable()
-    # print('Таблица Ордеров Акк. ПАТРОНА', patron_orders, div_line, sep='\n')
-    #
-    # # Копирование Ордеров
-    # exchanges.copy_orders(patron_orders)
-    #
-    # # Баланс Счетов:
-    # balances = {}
-    # patron_balance = exchanges.get_balance(exchanges.patron_exchange)
-    # balances[exchanges.data_base.patron['name'][0]] = patron_balance
-    #
-    # for client, exchange in exchanges.client_exchanges.items():
-    #     balance = exchanges.get_balance(exchange)
-    #     balances[client] = balance
-    #
-    # print(div_line)
-    # for account, balance in balances.items():
-    #     print(f'Баланс Акк. {account}:', balance, div_line, sep='\n')
 
 
 main()
