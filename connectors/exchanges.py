@@ -7,7 +7,7 @@ from connectors.logic_errors import LogicErrors     # Обработка Лог�
 
 PAUSE = 1           # Пауза между Запросами
 ACCOUNT_PAUSE = 3   # Пауза между Обработкой Клиентов
-SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')  # Сравнение по Торгуемым Парам
+SYMBOLS = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT', 'XLM/USDT')  # Сравнение по Торгуемым Парам
 div_line =    '--------------------------------------------------------------------------------------------------------'
 double_line = '========================================================================================================'
 
@@ -41,8 +41,10 @@ class Exchanges:
         self.orders = {}
 
     connects = {
+        'Binance': ccxt.binance,
+        'BitTeam': ccxt.bitteam,
         'ByBit': ccxt.bybit,
-        'Gate_io': ccxt.gateio,
+        'GateIo': ccxt.gateio,
         'Mexc': ccxt.mexc,
         'Okx': ccxt.okx
     }
@@ -152,9 +154,17 @@ class Exchanges:
                     print(order['symbol'], order['id'])
                 print(div_line)
             case _:
+                flag = True
                 for symbol in symbols:
-                    exchange.cancel_all_orders(symbol)
-                print(f'{account_name} | Удалены Все Ордера', div_line, sep='\n')
+                    try:
+                        exchange.cancel_all_orders(symbol)
+                    except:
+                        flag = False
+                        print(f'Нет Ответа от Сервера | {account_name} | {exchange} | {symbol}')
+                if flag:
+                    print(f'{account_name} | Удалены Все Ордера', div_line, sep='\n')
+                else:
+                    print(f'{account_name} | Был сбой. Удалены НЕ Все Ордера', div_line, sep='\n')
 
 
     def copy_orders(self, patron_orders):
@@ -199,6 +209,29 @@ class Exchanges:
                         print(message, message_3)
                     except Exception as error:
                         print(message, f'Объем = {amount}', error)
+                        if order['side'] == 'sell':
+                            try: # Попытка Поставить на всю свободную котлету
+                                coin_amount = self.get_free_coin_amount(order['symbol'], exchange)
+                                if coin_amount:
+                                    new_order = exchange.create_order(symbol=order['symbol'], type='limit', side=order['side'], amount=coin_amount, price=order['price'])
+                                    message_4 = f" | Для полного копирования нет достаточно объема. Создан Ордер с Объемом = {coin_amount} | ID: {new_order['id']}"
+                                    print(message, message_4)
+                            except Exception as error:
+                                print(message, f'Объем НЕполный = {coin_amount}', error)
+
+    def get_free_coin_amount(self, symbol, exchange):
+        coin = symbol.split('/')[0]
+        balance = self.get_balance(exchange)
+        if coin not in balance.columns:
+            return 0
+        coin_amount = balance[coin]['free']
+        cost_usdt = self.get_cost_usdt_coin(symbol, coin_amount, exchange)
+        if cost_usdt < 10.1: coin_amount = 0
+        return coin_amount
+
+    def get_cost_usdt_coin(self, symbol, amount, exchange):
+        price = exchange.fetch_ticker(symbol)['last']
+        return price * amount
 
     def get_template_amount(self, client, order):
         symbol, price, side = order['symbol'], order['price'], order['side']
@@ -243,9 +276,13 @@ class Exchanges:
         return agg_delta_orders
 
     def get_balance(self, exchange):
-        balance = exchange.fetch_balance()
-        indexes = ['free', 'used', 'total']
-        columns = [balance['free'], balance['used'], balance['total']]
-        df = pd.DataFrame(columns, index=indexes)
-        df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
-        return df_compact
+        try:
+            balance = exchange.fetch_balance()
+            indexes = ['free', 'used', 'total']
+            columns = [balance['free'], balance['used'], balance['total']]
+            df = pd.DataFrame(columns, index=indexes)
+            df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
+            return df_compact
+        except:
+            print(f'НЕ удалось получить Баланс. Сервер НЕ Отвечает. | {exchange}')
+            return 0

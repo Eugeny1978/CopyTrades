@@ -13,12 +13,12 @@ pd.options.display.max_rows = 30 # Макс Кол-во Отображаемых
 
 div_line = '-' * 120
 FORMAT_dt = '%Y-%m-%d %H:%M:%S'
-SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT')
+SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT', 'XLM/USDT')
 SYMBOLS_shit = ('DEL/USDT')
 PATRON_liquid = 'Constantin_ByBit'
 PATRON_shit = 'Constantin_Mexc'
 
-DATABASE = TEST_DB
+DATABASE = DATABASE
 TRADE_TYPE = 'Liquid_coins'
 BOT_NAME = 'Copy_liquid_market'
 INTERVAL = 60 # интервал между просмотром свежих сделок у Патрона

@@ -2,13 +2,13 @@ import sqlite3 as sq
 from datetime import datetime
 from data_base.path_to_base import DATABASE, TEST_DB # Рабочая и Тестовая Базы
 
-DATABASE = TEST_DB
+DATABASE = DATABASE
 # Run Pause, Stop
-COPY_BOT = 'Stop'
+COPY_BOT = 'Run'
 COPY_BOT_MECX = 'Run'
-COPY_LIQUID_MARKET = 'Stop'
-COPY_SHIT_MARKET = 'Stop'
+COPY_LIQUID_MARKET = 'Run'
 
+COPY_SHIT_MARKET = 'Stop'
 PATRON_BOT = 'Stop'
 
 
