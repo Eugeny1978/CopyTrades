@@ -36,13 +36,6 @@ def main():
     trades = patron.fetch_my_trades(symbol=SYMBOLS[0])
     jprint(trades)
 
-    # exchanges = Exchanges(SYMBOLS)
-    # patron = exchanges.patron_exchange
-    # trades = patron.fetch_my_trades(symbol=SYMBOLS[0])
-    # jprint(trades)
-
-
-
 
 if __name__ == "__main__":
     main()
