@@ -5,6 +5,7 @@ from time import sleep, localtime, strftime, time
 from data_base.path_to_base import DATABASE
 from connectors.exchanges_mecx import Exchanges
 
+
 pd.options.display.width= None # Отображение Таблицы на весь Экран
 pd.options.display.max_columns= 20 # Макс Кол-во Отображаемых Колонок
 pd.options.display.max_rows = 30 # Макс Кол-во Отображаемых Cтрок
@@ -12,7 +13,7 @@ pd.options.display.max_rows = 30 # Макс Кол-во Отображаемых
 # PAUSE = 1           # Пауза между Запросами
 # ACCOUNT_PAUSE = 3   # Пауза между Обработкой Клиентов
 # ORDER_PAUSE = 1
-PAUSE = 5*60 # Пауза между Полным циклом Проверки и Копирования Ордеров (мин)
+PAUSE = 10*60 # Пауза между Полным циклом Проверки и Копирования Ордеров (мин)
 SYMBOLS = ('DEL/USDT', ) # Сравнение по Торгуемым Парам
 div_line =    '--------------------------------------------------------------------------------------------------------'
 double_line = '========================================================================================================'
@@ -26,6 +27,7 @@ def get_bot_status():
 
 def get_local_time():
     t = localtime()
+
     current_time = strftime("%H:%M:%S", t)
     return current_time
 

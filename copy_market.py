@@ -13,8 +13,22 @@ pd.options.display.max_rows = 30 # Макс Кол-во Отображаемых
 
 div_line = '-' * 120
 FORMAT_dt = '%Y-%m-%d %H:%M:%S'
-SYMBOLS_liquid = ('ATOM/USDT', 'BTC/USDT', 'ETH/USDT', 'LINK/USDT', 'TRX/USDT', 'XLM/USDT')
-SYMBOLS_shit = ('DEL/USDT')
+SYMBOLS_liquid = (
+    'ARB/USDT',
+    'APT/USDT',
+    'BTC/USDT',
+    'ETH/USDT',
+    'ATOM/USDT',
+    'DOT/USDT',
+    'XLM/USDT',
+    'TRX/USDT',
+    'LINK/USDT',
+    'AVAX/USDT',
+    'ADA/USDT',
+    'OP/USDT',
+    'ROSE/USDT',
+    'TON/USDT')  # Сравнение по Торгуемым Парам
+SYMBOLS_shit = ('DEL/USDT', )
 PATRON_liquid = 'Constantin_ByBit'
 PATRON_shit = 'Constantin_Mexc'
 
@@ -88,8 +102,9 @@ class ClientData:
          SELECT name, exchange, rate, apiKey, secret, password 
          FROM {self.db_table} 
          WHERE exchange IN ('{row_exchanges}') 
-             AND status IS 'Active' 
-         """)
+             AND status IS 'Active'
+             
+         """) # AND name IS 'Mikoldin Ilya Vladimirovich'
         with sq.connect(DATABASE) as connect:
             connect.row_factory = sq.Row  # Строки записей в виде dict {}. По умолчанию - кортежи turple ()
             curs = connect.cursor()

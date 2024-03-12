@@ -9,6 +9,7 @@ COPY_BOT_MECX = 'Run'
 COPY_LIQUID_MARKET = 'Run'
 
 COPY_SHIT_MARKET = 'Stop'
+
 PATRON_BOT = 'Stop'
 
 

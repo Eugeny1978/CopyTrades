@@ -18,7 +18,7 @@ SYMBOLS = ('ATOM/USDT', 'ETH/USDT', 'BTC/USDT')
 SPREDS = (3, 4 ,5)
 VOLUME = 10
 ORDER_PAUSE = 1
-PAUSE = 60*60
+PAUSE = 4*60*60
 
 def print_d(*args):
     print(*args, div_line, sep='\n')
