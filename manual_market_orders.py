@@ -5,6 +5,9 @@ import pandas as pd
 
 Coins = Literal['Liquid', 'Shit']
 
+# Копировать Базу Данных
+# interface
+# manual_market_orders
 
 
 class Accounts:
