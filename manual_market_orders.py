@@ -50,7 +50,9 @@ class Accounts:
                 SELECT name, exchange, rate, apiKey, secret, password 
                 FROM {self.client_table}
                 WHERE status IS 'Active'
-                """)
+                ORDER BY name ASC
+                
+                """) # LIMIT 3
                 accounts = dict()
                 for acc in curs:
                     accounts[acc[0]] = dict(exchange=acc[1],  rate=acc[2], apiKey=acc[3], secret=acc[4], password=acc[5])
@@ -197,10 +199,10 @@ if __name__ == '__main__':
     DB = DATABASE
     TYPE_COINS = 'Liquid'
 
-    SYMBOL = ''
-    SIDE = ''
+    SYMBOL = 'ATOM/USDT'
+    SIDE = 'sell'
     AMOUNT = 0
-    COST = 0
+    COST = 10.2
 
     accounts = Accounts(DB, 'Liquid')
     dprint(accounts.symbols)
@@ -218,6 +220,6 @@ if __name__ == '__main__':
     dprint(cost_balance)
     dprint(orders)
 
-    # market_order = accounts.create_market_order(acc_connect, 'ATOM/USDT', 'sell', cost=10.2)
+    # market_order = accounts.create_market_order(connect=acc_connect, symbol=SYMBOL, side=SIDE, cost=COST)
     # dprint(market_order)
     # print(json.dumps(market_order), div_line, sep='\n')
