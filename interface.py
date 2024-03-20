@@ -1,6 +1,6 @@
 import streamlit as st
 from data_base.path_to_base import DATABASE
-from manual_market_orders import Accounts
+from manual_market_orders import Accounts, style_amount, style_cost
 
 # В терминале набрать: streamlit run interface.py
 
@@ -29,6 +29,7 @@ for tab, account in zip(tabs, accounts.data.keys()):
         connect = accounts.connect_account(account)
         balance = accounts.get_balance(connect)
         cost_balance = accounts.get_cost_balance(balance)
+        sum_cost = accounts.get_sum_cost_balance(cost_balance)
         orders = accounts.get_orders(connect)
 
         st.markdown(f"{'#'*5} {account}     |     Trade Rate: {rate}")
@@ -36,9 +37,9 @@ for tab, account in zip(tabs, accounts.data.keys()):
         colA, colB = st.columns([2.3, 1])
         with colA:
             st.markdown(':red[SPOT Balance:]')
-            st.dataframe(balance, use_container_width=True)
-            st.markdown(':red[COST USDT Balance:]')
-            st.dataframe(cost_balance, use_container_width=True)
+            st.dataframe(balance.style.pipe(style_amount), use_container_width=True)
+            st.markdown(f':red[COST Balance: | {sum_cost} USDT |]')
+            st.dataframe(cost_balance.style.pipe(style_cost), use_container_width=True) #
         with colB:
             st.markdown(':red[Active ORDERS:]')
             st.dataframe(orders, use_container_width=True)

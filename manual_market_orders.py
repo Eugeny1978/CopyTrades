@@ -6,9 +6,25 @@ import pandas as pd
 Coins = Literal['Liquid', 'Shit']
 Sides = Literal['sell', 'buy']
 
-# Копировать Базу Данных
+# Базу Данных - УЖЕ СКОПИРОВАЛ, на сервере она новее (есть новые таблицы и клиенты)
+# КОПИРОВАТЬ файлы:
 # interface
+# market_orders
 # manual_market_orders
+# create_order_bybit.json
+
+
+def style_amount(styler):
+    # styler.set_caption("SPOT Balance")
+    # styler.format_index(str.upper, axis=1)
+    styler.format(precision=6, thousands=" ", decimal=".")
+    return styler
+
+def style_cost(styler):
+    # styler.set_caption("COST USDT Balance")
+    # styler.format_index(str.upper, axis=1)
+    styler.format(precision=2, thousands=" ", decimal=".")
+    return styler
 
 
 class Accounts:
@@ -129,7 +145,7 @@ class Accounts:
                 cost_balance[coin] = round(cost_balance[coin], 2)
                 continue
             if coin not in self.__get_trade_coins():
-                cost_balance[coin] = ['- Not - ', 'Trading', '- Coin -']
+                cost_balance[coin] = ['- Not - ', 'Trading', 0]
                 continue
             symbol = coin + '/USDT'
             cost_balance[coin] = round(cost_balance[coin] * self.last_prices[symbol], 2)
@@ -159,6 +175,10 @@ class Accounts:
                                order['remaining'],
                                order_cost)
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+
+    def get_sum_cost_balance(self, cost_balance: pd.DataFrame):
+        return round(cost_balance.tail(1).sum(axis=1)['total'], 2)
+
 
     def create_market_order(self, connect: ccxt.Exchange, symbol: str, side: Sides, amount: float = 0, cost: float = 0):
         flag = True
@@ -196,6 +216,9 @@ if __name__ == '__main__':
         pprint(args)
         print(div_line)
 
+    def jprint(data):
+        print(json.dumps(data), div_line, sep='\n')
+
     DB = DATABASE
     TYPE_COINS = 'Liquid'
 
@@ -205,21 +228,28 @@ if __name__ == '__main__':
     COST = 10.2
 
     accounts = Accounts(DB, 'Liquid')
-    dprint(accounts.symbols)
-    dprint(accounts.data)
-    dprint(accounts.last_prices)
+    # dprint(accounts.symbols)
+    # dprint(accounts.data)
+    # dprint(accounts.last_prices)
 
     acc_name = 'Kubarev Mihail'
     acc_rate = accounts.get_rate(acc_name)
     acc_connect = accounts.connect_account(acc_name)
     balance = accounts.get_balance(acc_connect)
     cost_balance = accounts.get_cost_balance(balance)
+    sum_cost = accounts.get_sum_cost_balance(cost_balance)
     orders = accounts.get_orders(acc_connect)
-    dprint(acc_rate)
-    dprint(balance)
-    dprint(cost_balance)
-    dprint(orders)
+    # dprint(acc_rate)
+    # dprint(balance)
+    # dprint(cost_balance)
+    dprint(sum_cost)
+    # dprint(orders)
+
 
     # market_order = accounts.create_market_order(connect=acc_connect, symbol=SYMBOL, side=SIDE, cost=COST)
     # dprint(market_order)
-    # print(json.dumps(market_order), div_line, sep='\n')
+    # jprint(market_order)
+
+    # ledger = acc_connect.fetch_ledger('USDT', limit=100)
+    # jprint(ledger)
+
