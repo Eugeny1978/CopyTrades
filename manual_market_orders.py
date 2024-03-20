@@ -4,6 +4,7 @@ import ccxt
 import pandas as pd
 
 Coins = Literal['Liquid', 'Shit']
+Sides = Literal['sell', 'buy']
 
 # Копировать Базу Данных
 # interface
@@ -13,15 +14,6 @@ Coins = Literal['Liquid', 'Shit']
 class Accounts:
 
     zero = pd.DataFrame()
-
-    def __init__(self, database, type_coins: Coins='Liquid'):
-        self.database = database
-        self.type_coins = type_coins
-        self.client_table, self.symbol_table = self.get_db_table_names()
-        self.data: dict = self.get_accounts()
-        self.symbols: tuple = self.get_symbols()
-        self.last_prices: dict = self.get_last_prices()
-
     connects = {
         'Binance': ccxt.binance,
         'BitTeam': ccxt.bitteam,
@@ -31,7 +23,15 @@ class Accounts:
         'Okx': ccxt.okx
     }
 
-    def get_db_table_names(self):
+    def __init__(self, database, type_coins: Coins='Liquid'):
+        self.database = database
+        self.type_coins = type_coins
+        self.client_table, self.symbol_table = self.__get_db_table_names()
+        self.data: dict = self.get_accounts()
+        self.symbols: tuple = self.get_symbols()
+        self.last_prices: dict = self.get_last_prices()
+
+    def __get_db_table_names(self):
         match self.type_coins:
             case 'Liquid':
                 client_table = 'Clients'
@@ -85,6 +85,9 @@ class Accounts:
         # self.last_prices = last_prices
         return last_prices
 
+    def get_rate(self, account_name):
+        return self.data[account_name]['rate']
+
     def connect_account(self, account_name) -> ccxt.Exchange:
         account = self.data[account_name]
         exchange_name = account['exchange']
@@ -112,7 +115,7 @@ class Accounts:
             print(f"get_balance(self, connect) | Не удалось получить Баланс {connect}")
             return self.zero
 
-    def get_trade_coins(self):
+    def __get_trade_coins(self):
         return tuple([symbol.split('/')[0] for symbol in self.symbols])
 
     def get_cost_balance(self, balance: pd.DataFrame) -> pd.DataFrame:
@@ -123,7 +126,7 @@ class Accounts:
             if coin == 'USDT':
                 cost_balance[coin] = round(cost_balance[coin], 2)
                 continue
-            if coin not in self.get_trade_coins():
+            if coin not in self.__get_trade_coins():
                 cost_balance[coin] = ['- Not - ', 'Trading', '- Coin -']
                 continue
             symbol = coin + '/USDT'
@@ -133,31 +136,46 @@ class Accounts:
     def get_orders(self, connect: ccxt.Exchange) -> pd.DataFrame:
         if not connect:
             return self.zero
+        orders = []
+        for symbol in self.symbols:
+            try:
+                order_list = connect.fetch_open_orders(symbol)
+                for order in order_list:
+                    orders.append(order)
+            except:
+                print(f"get_orders(self, connect) | Не удалось Получить список Ордеров. | Биржа: {connect}.")
+        return self.__convert_orders_to_df(orders)
+
+    def __convert_orders_to_df(self, orders):
+        df = pd.DataFrame(columns=('symbol', 'type', 'side', 'price', 'amount', 'cost'))
+        for order in orders:
+            order_cost = round(order['remaining'] * self.last_prices[order['symbol']], 2)
+            df.loc[len(df)] = (order['symbol'],
+                               order['type'],
+                               order['side'],
+                               order['price'],
+                               order['remaining'],
+                               order_cost)
+        return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
+
+    def create_market_order(self, connect: ccxt.Exchange, symbol: str, side: Sides, amount: float = 0, cost: float = 0):
+        flag = True
+        if not symbol:
+            flag = False
+            print('Не задан SYMBOL!')
+        if not side:
+            flag = False
+            print('Не задан SIDE (sell or buy)!')
+        if not amount and not cost:
+            flag = False
+            print('Не задан Размер Ордера!')
+        if not flag: return
+        if not amount: #  and cost
+            amount = cost / self.last_prices[symbol] # нужно ли округлять?
         try:
-            orders = connect.fetch_open_orders()
-            indexes = ['free', 'used', 'total']
-            columns = [balance['free'], balance['used'], balance['total']]
-            df = pd.DataFrame(columns, index=indexes)
-            df_compact = df.loc[:, (df != 0).any(axis=0)]  # убирает Столбцы с 0 значениями
-            return df_compact
+            return connect.create_market_order(symbol, side, amount)
         except:
-            print(f"get_balance(self, connect) | Не удалось получить Баланс {connect}")
-            return self.zero
-
-        # def get_account_orders(self, account_name, exchange):
-        #     orders = []
-        #     for symbol in self.symbols:
-        #         try:
-        #             order_list = exchange.fetch_open_orders(symbol)
-        #             for order in order_list:
-        #                 orders.append(order)
-        #                 self.orders[account_name] = self.get_order_table(orders)
-        #         except:
-        #             print(f'API Биржи: Не удалось Получить список Ордеров. | Биржа: {exchange}.')
-        #     return self.__convert_orders_to_df(orders)
-
-
-
+            print(f"create_market_order() | Не удалось создать Ордер")
 
 
 
@@ -165,6 +183,7 @@ if __name__ == '__main__':
 
     from data_base.path_to_base import DATABASE, TEST_DB
     from pprint import pprint
+    import json
 
     pd.options.display.width = None  # Отображение Таблицы на весь Экран
     pd.options.display.max_columns = 20  # Макс Кол-во Отображаемых Колонок
@@ -188,10 +207,17 @@ if __name__ == '__main__':
     dprint(accounts.data)
     dprint(accounts.last_prices)
 
-    acc_connect = accounts.connect_account('Kubarev Mihail')
+    acc_name = 'Kubarev Mihail'
+    acc_rate = accounts.get_rate(acc_name)
+    acc_connect = accounts.connect_account(acc_name)
     balance = accounts.get_balance(acc_connect)
     cost_balance = accounts.get_cost_balance(balance)
+    orders = accounts.get_orders(acc_connect)
+    dprint(acc_rate)
     dprint(balance)
     dprint(cost_balance)
+    dprint(orders)
 
-
+    # market_order = accounts.create_market_order(acc_connect, 'ATOM/USDT', 'sell', cost=10.2)
+    # dprint(market_order)
+    # print(json.dumps(market_order), div_line, sep='\n')

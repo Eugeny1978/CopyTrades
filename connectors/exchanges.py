@@ -115,7 +115,7 @@ class Exchanges:
                 order_list = exchange.fetch_open_orders(symbol)
                 for order in order_list:
                     orders.append(order)
-                    self.orders[account_name] = self.get_order_table(orders)
+                # self.orders[account_name] = self.get_order_table(orders) # табулировать на уровень?!
             except:
                 print(f'API Биржи: Не удалось Получить список Ордеров. | Биржа: {exchange}.')
         return self.__convert_orders_to_df(orders)
