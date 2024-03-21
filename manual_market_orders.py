@@ -43,20 +43,24 @@ class Accounts:
     def __init__(self, database, type_coins: Coins='Liquid'):
         self.database = database
         self.type_coins = type_coins
-        self.client_table, self.symbol_table = self.__get_db_table_names()
+        self.client_table, self.symbol_table, self.exchange_for_last_prices = self.__get_coin_data()
         self.data: dict = self.get_accounts()
         self.symbols: tuple = self.get_symbols()
         self.last_prices: dict = self.get_last_prices()
 
-    def __get_db_table_names(self):
+    def __get_coin_data(self):
         match self.type_coins:
             case 'Liquid':
                 client_table = 'Clients'
                 symbol_table = 'Symbols'
+                exchange_for_last_prices = 'ByBit'
             case 'Shit':
                 client_table = 'Clients_Mexc'
                 symbol_table = 'Symbols_Mexc'
-        return client_table, symbol_table
+                exchange_for_last_prices = 'Mexc'
+            case _:
+                raise ("__get_coin_data(self) | Не корректно задан Тип КриптоВалют | Допустимо: 'Liquid', 'Shit'")
+        return client_table, symbol_table, exchange_for_last_prices
 
     def get_accounts(self) -> dict:
         try:
@@ -94,13 +98,14 @@ class Accounts:
         'Liquid' - Использую цены ByBit
         'Shit'   - Использую цены Mexc
         """
-        if self.type_coins == 'Liquid':
-            exchange = self.connects['ByBit']()
-        elif self.type_coins == 'Shit':
-            exchange = self.connects['Mexc']()
-        else:
-            print("get_last_prices(self) | Не корректно задан Тип КриптоВалют | Допустимо: 'Liquid', 'Shit'")
-            return
+        # if self.type_coins == 'Liquid':
+        #     exchange = self.connects['ByBit']()
+        # elif self.type_coins == 'Shit':
+        #     exchange = self.connects['Mexc']()
+        # else:
+        #     print("get_last_prices(self) | Не корректно задан Тип КриптоВалют | Допустимо: 'Liquid', 'Shit'")
+        #     return
+        exchange = self.connects[self.exchange_for_last_prices]()
         last_prices = {}
         for symbol in self.symbols:
             try:
