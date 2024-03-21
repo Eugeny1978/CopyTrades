@@ -48,7 +48,7 @@ with tab_order:
         with col_amount:
             amount = st.number_input('Amount:', min_value=0.0, value=None, format='%f', placeholder="Set Amount or Cost USDT") # format='%.6f'
         with col_cost:
-            cost = st.number_input('Cost USDT:', min_value=0.0, value=None, format='%f', placeholder="Set Amount or Cost USDT") # format='%.6f'
+            cost = st.number_input('Cost USDT:', min_value=10.0, value=None, format='%f', placeholder="Set Amount or Cost USDT") # format='%.6f'
         with col_button:
             # st.markdown('Click after filling in the fields')
             # st.caption('---')
@@ -58,8 +58,8 @@ with tab_order:
                 else: volume = f"Cost USDT: {cost}"
                 order_message = f"Рыночный Ордер: {symbol} | {side.upper()} | {volume}"
                 try:
-                    # accounts.create_market_order(connect, symbol, side, amount, cost)
                     # ttt = 55/0 # для тестов проверил выполнение исключения
+                    accounts.create_market_order(connect, symbol, side, amount, cost)
                     st.markdown(f":green[Был создан {order_message}]")
                 except:
                     st.markdown(f":red[Сбой Соединения с API Биржи. Не удалось создать {order_message}]")
