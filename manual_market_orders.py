@@ -188,7 +188,7 @@ class Accounts:
         return self.__convert_orders_to_df(orders)
 
     def __convert_orders_to_df(self, orders):
-        df = pd.DataFrame(columns=('symbol', 'type', 'side', 'price', 'amount', 'cost'))
+        df = pd.DataFrame(columns=['symbol', 'type', 'side', 'price', 'amount', 'cost'])
         for order in orders:
             order_cost = round(order['remaining'] * self.last_prices[order['symbol']], 2)
             df.loc[len(df)] = (order['symbol'],
