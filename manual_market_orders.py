@@ -233,12 +233,12 @@ if __name__ == '__main__':
         print(json.dumps(data), div_line, sep='\n')
 
     DB = DATABASE
-    TYPE_COINS = 'Shit' # 'Liquid'
+    TYPE_COINS = 'Liquid' # 'Shit'
 
-    SYMBOL = 'DEL/USDT '# 'ATOM/USDT'
+    SYMBOL = 'ATOM/USDT' # 'DEL/USDT'
     SIDE = 'buy'
     AMOUNT = 0
-    COST = 3.2
+    COST = 10.2
 
     accounts = Accounts(DB, 'Liquid')
     dprint(accounts.symbols)
