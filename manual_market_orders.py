@@ -12,6 +12,7 @@ Sides = Literal['sell', 'buy']
 # market_orders
 # manual_market_orders
 # create_order_bybit.json
+# Обновить ccxt
 
 
 def style_amount(styler):
@@ -90,9 +91,16 @@ class Accounts:
 
     def get_last_prices(self):
         """
-        Использую цены ByBit
+        'Liquid' - Использую цены ByBit
+        'Shit'   - Использую цены Mexc
         """
-        exchange = self.connects['ByBit']()
+        if self.type_coins == 'Liquid':
+            exchange = self.connects['ByBit']()
+        elif self.type_coins == 'Shit':
+            exchange = self.connects['Mexc']()
+        else:
+            print("get_last_prices(self) | Не корректно задан Тип КриптоВалют | Допустимо: 'Liquid', 'Shit'")
+            return
         last_prices = {}
         for symbol in self.symbols:
             try:
@@ -220,17 +228,17 @@ if __name__ == '__main__':
         print(json.dumps(data), div_line, sep='\n')
 
     DB = DATABASE
-    TYPE_COINS = 'Liquid'
+    TYPE_COINS = 'Shit' # 'Liquid'
 
-    SYMBOL = 'ATOM/USDT'
-    SIDE = 'sell'
+    SYMBOL = 'DEL/USDT '# 'ATOM/USDT'
+    SIDE = 'buy'
     AMOUNT = 0
-    COST = 10.2
+    COST = 3.2
 
     accounts = Accounts(DB, 'Liquid')
-    # dprint(accounts.symbols)
-    # dprint(accounts.data)
-    # dprint(accounts.last_prices)
+    dprint(accounts.symbols)
+    dprint(accounts.data)
+    dprint(accounts.last_prices)
 
     acc_name = 'Kubarev Mihail'
     acc_rate = accounts.get_rate(acc_name)
@@ -239,11 +247,11 @@ if __name__ == '__main__':
     cost_balance = accounts.get_cost_balance(balance)
     sum_cost = accounts.get_sum_cost_balance(cost_balance)
     orders = accounts.get_orders(acc_connect)
-    # dprint(acc_rate)
-    # dprint(balance)
-    # dprint(cost_balance)
+    dprint(acc_rate)
+    dprint(balance)
+    dprint(cost_balance)
     dprint(sum_cost)
-    # dprint(orders)
+    dprint(orders)
 
 
     # market_order = accounts.create_market_order(connect=acc_connect, symbol=SYMBOL, side=SIDE, cost=COST)
