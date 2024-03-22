@@ -6,9 +6,24 @@ from manual_market_orders import Accounts, style_amount, style_cost
 
 coins = ('Liquid', 'Shit')
 
+
+def create_order(accounts, connect, symbol, side, amount, cost):
+    if symbol and side and (cost or amount):
+        if amount:
+            volume = f"Amount: {amount}"
+        else:
+            volume = f"Cost USDT: {cost}"
+        order_message = f"Рыночный Ордер: {symbol} | {side.upper()} | {volume}"
+        try:
+            accounts.create_market_order(connect, symbol, side, amount, cost)
+            st.markdown(f":green[Был создан {order_message}]")
+        except:
+            st.markdown(f":red[Сбой Соединения с API Биржи. Не удалось создать {order_message}]")
+
+
 # ЛОГИКА СТРАНИЦЫ
 
-st.set_page_config(layout="wide") # Вся страница вместо узкой центральной колонки
+st.set_page_config(layout="wide")  # Вся страница вместо узкой центральной колонки
 cols = st.columns([8, 1])
 with cols[0]:
     st.header('Создание Рыночных Ордеров Клиенту', anchor=False, divider='red')
@@ -34,7 +49,7 @@ with tab_info:
         st.markdown(':red[SPOT Balance:]')
         st.dataframe(balance.style.pipe(style_amount), use_container_width=True)
         st.markdown(f':red[COST Balance: | {sum_cost} USDT |]')
-        st.dataframe(cost_balance.style.pipe(style_cost), use_container_width=True) #
+        st.dataframe(cost_balance, use_container_width=True)  # .style.pipe(style_cost)
     with colB:
         st.markdown(':red[Active ORDERS:]')
         st.dataframe(orders, use_container_width=True)
@@ -46,23 +61,17 @@ with tab_order:
         with col_side:
             side = st.selectbox('SIDE:', index=None, options=('sell', 'buy'), placeholder="Choose Side")
         with col_amount:
-            amount = st.number_input('Amount:', min_value=0.0, value=None, format='%f', placeholder="Set Amount or Cost USDT") # format='%.6f'
+            amount = st.number_input('Amount:', min_value=0.0, value=None, format='%f',
+                                     placeholder="Set Amount or Cost USDT")  # format='%.6f'
         with col_cost:
-            cost = st.number_input('Cost USDT:', min_value=10.0, value=None, format='%f', placeholder="Set Amount or Cost USDT") # format='%.6f'
+            cost = st.number_input('Cost USDT:', min_value=10.0, value=None, format='%f',
+                                   placeholder="Set Amount or Cost USDT")  # format='%.6f'
         with col_button:
-            # st.markdown('Click after filling in the fields')
             # st.caption('---')
-            button = st.form_submit_button('Создать Market Order', use_container_width=True)
-            if symbol and side and (cost or amount):
-                if amount: volume = f"Amount: {amount}"
-                else: volume = f"Cost USDT: {cost}"
-                order_message = f"Рыночный Ордер: {symbol} | {side.upper()} | {volume}"
-                try:
-                    # ttt = 55/0 # для тестов проверил выполнение исключения
-                    accounts.create_market_order(connect, symbol, side, amount, cost)
-                    st.markdown(f":green[Был создан {order_message}]")
-                except:
-                    st.markdown(f":red[Сбой Соединения с API Биржи. Не удалось создать {order_message}]")
-            else:
-                st.markdown(':red[Заполните Все Необходимые Поля, иначе при нажатии Кнопки "Создать Market Order" запрос на биржу отправлен не будет]')
+            click_args = (accounts, connect, symbol, side, amount, cost)
+            button = st.form_submit_button('Создать Market Order', on_click=create_order, args=click_args,
+                                           use_container_width=True)
+            st.markdown(
+                ':red[Заполните Все Необходимые Поля, иначе при нажатии Кнопки "Создать Market Order" запрос на биржу отправлен не будет]')
+            st.markdown(':red[Для Создания Ордера 2-ды нажмите Кнопку]')
         st.markdown(':red[После ввода значений не нажимайте Enter - сработает обновление страницы!]')

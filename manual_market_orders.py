@@ -23,7 +23,6 @@ def style_amount(styler):
 
 def style_cost(styler):
     # styler.set_caption("COST USDT Balance")
-    # styler.format_index(str.upper, axis=1)
     styler.format(precision=2, thousands=" ", decimal=".")
     return styler
 
@@ -71,8 +70,7 @@ class Accounts:
                 SELECT name, exchange, rate, apiKey, secret, password 
                 FROM {self.client_table}
                 WHERE status IS 'Active'
-                ORDER BY name ASC
-                
+                ORDER BY name ASC                
                 """) # LIMIT 3
                 accounts = dict()
                 for acc in curs:
@@ -98,13 +96,6 @@ class Accounts:
         'Liquid' - Использую цены ByBit
         'Shit'   - Использую цены Mexc
         """
-        # if self.type_coins == 'Liquid':
-        #     exchange = self.connects['ByBit']()
-        # elif self.type_coins == 'Shit':
-        #     exchange = self.connects['Mexc']()
-        # else:
-        #     print("get_last_prices(self) | Не корректно задан Тип КриптоВалют | Допустимо: 'Liquid', 'Shit'")
-        #     return
         exchange = self.connects[self.exchange_for_last_prices]()
         last_prices = {}
         for symbol in self.symbols:
@@ -113,7 +104,6 @@ class Accounts:
             except:
                 last_prices[symbol] = 0
                 print(f'get_last_prices(self) | Не удалось получить Последнюю Цену по Символу: {symbol}')
-        # self.last_prices = last_prices
         return last_prices
 
     def get_rate(self, account_name):
@@ -158,7 +148,7 @@ class Accounts:
                 cost_balance[coin] = round(cost_balance[coin], 2)
                 continue
             if coin not in self.__get_trade_coins():
-                cost_balance[coin] = ['- Not - ', 'Trading', 0]
+                cost_balance[coin] = [0, 0, 0] # ['- Not - ', 'Trading', 0]
                 continue
             symbol = coin + '/USDT'
             cost_balance[coin] = round(cost_balance[coin] * self.last_prices[symbol], 2)
@@ -168,10 +158,10 @@ class Accounts:
         # round(cost_balance.tail(1).sum(axis=1)['total'], 2)
         return round(cost_balance.loc['total'].sum(), 2)
 
-
     def __normalize_total_cost(self, cost_balance: pd.DataFrame):
         sum_cost = self.get_sum_cost_balance(cost_balance)
-        cost_balance.loc['total_%'] = round((100 * cost_balance.loc['total'] / sum_cost), 1)
+        if sum_cost:
+            cost_balance.loc['total_%'] = round((100 * cost_balance.loc['total'] / sum_cost), 1)
         return cost_balance
 
     def get_orders(self, connect: ccxt.Exchange) -> pd.DataFrame:
@@ -199,9 +189,6 @@ class Accounts:
                                order_cost)
         return df.groupby(['symbol', 'type', 'side', 'price']).sum().reset_index()
 
-
-
-
     def create_market_order(self, connect: ccxt.Exchange, symbol: str, side: Sides, amount: float = 0, cost: float = 0):
         flag = True
         if not symbol:
@@ -220,7 +207,6 @@ class Accounts:
             return connect.create_market_order(symbol, side, amount)
         except:
             print(f"create_market_order() | Не удалось создать Ордер")
-
 
 
 if __name__ == '__main__':
@@ -267,11 +253,9 @@ if __name__ == '__main__':
     dprint(sum_cost)
     # dprint(orders)
 
-
     # market_order = accounts.create_market_order(connect=acc_connect, symbol=SYMBOL, side=SIDE, cost=COST)
     # dprint(market_order)
     # jprint(market_order)
 
     # ledger = acc_connect.fetch_ledger('USDT', limit=100)
     # jprint(ledger)
-
